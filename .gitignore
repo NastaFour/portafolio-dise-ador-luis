@@ -1,0 +1,14 @@
+# Archivos de configuración del agente
+opencode.json
+
+# Documentación interna
+README.md
+
+# Skills del equipo
+skills/
+
+# Referencias del diseñador
+referencia del dise;ador/
+
+# Subagente
+subagente/
