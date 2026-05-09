@@ -874,41 +874,169 @@
     .reveal-d4 { transition-delay: 0.32s; }
 
     /* ============================================================
-       RESPONSIVE
+       RESPONSIVE — Mobile-first adaptations
        ============================================================ */
+
+    /* ── Tablet (≤768px) ── */
     @media (max-width: 768px) {
-      .manifesto__grid,
-      .specialties__grid,
-      .specialties__footer,
-      .raun-detail__grid,
-      .raun-concept,
-      .about__grid,
-      .contact__grid {
-        grid-template-columns: 1fr;
-      }
+      .section { padding: 3rem 0; }
 
-      .specialties__header {
-        grid-template-columns: 1fr;
-      }
+      /* Header */
+      .header { padding: 1rem var(--spacing); }
+      .header__brand { font-size: 0.7rem; }
+      .header__nav { display: flex; gap: 0.8rem; flex-wrap: wrap; justify-content: flex-end; }
+      .header__nav a { font-size: 0.6rem; letter-spacing: 0.06em; }
 
-      .specialties__title { text-align: left; }
-      .specialties__title-accent { display: block; }
+      /* Hero */
+      .hero { min-height: 70vh; padding: 0 var(--spacing); text-align: left; }
+      .hero__name { font-size: clamp(2.5rem, 14vw, 5rem); }
+      .hero__subtitle { font-size: clamp(0.75rem, 3vw, 0.9rem); letter-spacing: 0.12em; }
+      .hero__seal { margin-top: 2rem; padding: 0.8rem 1.5rem; font-size: 0.7rem; }
+      .hero__seal .kanji { font-size: 1.5rem; }
+      .hero__scroll-hint { display: none; }
 
-      .header__nav { display: block; }
+      /* Manifesto */
+      .manifesto__grid { grid-template-columns: 1fr; gap: 1.5rem; }
+      .manifesto__label { font-size: clamp(1.5rem, 6vw, 2rem); }
+      .manifesto__principles { gap: 0.3rem 1rem; }
+      .manifesto__principles li { font-size: 0.7rem; }
+      .manifesto__text { font-size: 0.85rem; }
 
-      .raun__book { width: min(70%, 280px); }
-      .raun__title-float--tl { left: 4%; font-size: 1.5rem; }
-      .raun__title-float--br { right: 4%; font-size: 1.2rem; }
-      .profile__photo { width: 140px; height: 140px; }
+      /* Profile */
+      .profile { margin-top: 0; padding: 1rem 0; }
+      .profile__photo { width: 130px; height: 130px; border-width: 2px; }
+      .profile__hint { font-size: 0.55rem; }
+
+      /* Specialties */
+      .specialties { padding: 2rem 0; }
+      .specialties__header { grid-template-columns: 1fr; margin-bottom: 1.5rem; }
+      .specialties__title { text-align: left; font-size: clamp(1.8rem, 8vw, 3rem); }
+      .specialties__title-accent { display: none; }
+      .specialties__grid { grid-template-columns: 1fr; gap: 1rem; }
+      .specialty-card { padding: 0.6rem 0; }
+      .specialty-card__title { font-size: 1.1rem; }
+      .specialty-card__desc { font-size: 0.8rem; }
+      .specialties__footer { grid-template-columns: 1fr; gap: 1rem; margin-top: 1.5rem; }
+      .specialties__statement { font-size: 0.85rem; }
+
+      /* RAUN */
+      .raun { min-height: 60vh; padding: 2rem var(--spacing); }
+      .raun__book { width: min(65%, 260px); }
+      .raun__title-float--tl { left: 5%; top: 10%; font-size: 1.3rem; }
+      .raun__title-float--br { right: 5%; bottom: 8%; font-size: 1rem; }
+
+      /* RAUN Detail */
+      .raun-detail { padding: 3rem 0; }
+      .raun-detail__grid { grid-template-columns: 1fr; gap: 1.5rem; }
+      .raun-big-letter { font-size: clamp(4rem, 20vw, 10rem); }
+      .raun-detail__meta li { font-size: 0.75rem; }
+      .raun-detail__desc { font-size: 0.85rem; }
+      .raun-concept { grid-template-columns: 1fr; gap: 1.5rem; margin-top: 2rem; }
+      .raun-concept h3 { font-size: 1.4rem; }
+      .raun-shibui { margin-top: 2rem; padding: 1.5rem; }
+
+      /* About */
+      .about { padding: 3rem 0; }
+      .about__grid { grid-template-columns: 1fr; gap: 2rem; }
+      .about__title { font-size: clamp(1.8rem, 6vw, 2.4rem); }
+
+      /* Contact */
+      .contact { padding: 3rem 0; }
+      .contact__grid { grid-template-columns: 1fr; gap: 2rem; }
+      .contact__title { font-size: clamp(1.8rem, 6vw, 2.4rem); }
+
+      /* Footer */
+      .footer { padding: 1.5rem var(--spacing); flex-direction: column; text-align: center; gap: 0.5rem; }
     }
 
+    /* ── Mobile (≤480px) ── */
     @media (max-width: 480px) {
-      .hero__seal { padding: 1rem 1.5rem; }
-      .raun-big-letter { font-size: clamp(5rem, 25vw, 10rem); }
-      .raun__book { width: min(85%, 220px); }
-      .profile__photo { width: 120px; height: 120px; }
+      .section { padding: 2.5rem 0; }
+      .section-label { font-size: 0.6rem; margin-bottom: 1rem; }
+
+      /* Header */
+      .header { padding: 0.8rem 1rem; }
+      .header__inner { gap: 0.5rem; }
+      .header__nav { gap: 0.5rem; }
+      .header__nav a { font-size: 0.55rem; }
+
+      /* Hero */
+      .hero { min-height: 60vh; }
+      .hero__name { font-size: clamp(2rem, 12vw, 3.5rem); }
+      .hero__subtitle { font-size: 0.7rem; }
+      .hero__seal { padding: 0.6rem 1rem; font-size: 0.65rem; margin-top: 1.5rem; }
+      .hero__seal .kanji { font-size: 1.2rem; }
+
+      /* Manifesto */
+      .manifesto { padding: 2rem 0; }
+      .manifesto__label { font-size: 1.3rem; }
+      .manifesto__principles li { font-size: 0.65rem; padding-left: 0.7rem; }
+      .manifesto__text { font-size: 0.8rem; }
+
+      /* Profile */
+      .profile { padding: 0.5rem 0; }
+      .profile__photo { width: 110px; height: 110px; }
+      .profile__hint { font-size: 0.5rem; letter-spacing: 0.08em; }
+
+      /* Specialties */
+      .specialties { padding: 1.5rem 0; }
+      .specialties__title { font-size: 1.6rem; }
+      .specialty-card__title { font-size: 1rem; }
+      .specialty-card__desc { font-size: 0.75rem; }
+      .specialties__statement { font-size: 0.8rem; }
+
+      /* RAUN */
+      .raun { min-height: 50vh; padding: 1.5rem 1rem; }
+      .raun__book { width: min(80%, 200px); }
+      .raun__title-float--tl { font-size: 1rem; left: 4%; }
+      .raun__title-float--br { font-size: 0.8rem; right: 4%; }
+      .raun__label { font-size: 0.55rem; }
+
+      /* RAUN Detail */
+      .raun-big-letter { font-size: clamp(3rem, 25vw, 6rem); }
+      .raun-shibui { padding: 1rem; }
+      .raun-shibui h3 { font-size: 1.1rem; }
+      .raun-shibui p { font-size: 0.75rem; }
+      .raun-concept h3 { font-size: 1.2rem; }
+      .raun-concept p { font-size: 0.8rem; }
+
+      /* About */
+      .about__title { font-size: 1.6rem; }
+      .about__text { font-size: 0.8rem; }
+      .about__skill { font-size: 0.6rem; padding: 0.2rem 0.6rem; }
+
+      /* Contact */
+      .contact__title { font-size: 1.6rem; }
+      .contact__text { font-size: 0.8rem; }
+      .contact__value { font-size: 0.85rem; }
+      .contact__ref-name { font-size: 0.8rem; }
+      .contact__ref-phone { font-size: 0.7rem; }
+
+      /* Footer */
+      .footer { padding: 1rem; }
+      .footer__text { font-size: 0.6rem; }
     }
-  </style>
+
+    /* ── Mobile base fixes ── */
+    @media (max-width: 768px) {
+      body {
+        -webkit-tap-highlight-color: transparent;
+        -webkit-overflow-scrolling: touch;
+      }
+
+      .container {
+        padding: 0 1.2rem;
+      }
+
+      img {
+        max-width: 100%;
+        height: auto;
+      }
+
+      .reveal {
+        transform: translateY(16px);
+      }
+    }  </style>
 </head>
 <body>
 
