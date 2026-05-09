@@ -179,7 +179,7 @@
       border: 1px solid var(--accent);
       padding: 1.2rem 2rem;
       line-height: 1.5;
-      opacity: 0;
+      opacity: 0.6;
       animation: sealReveal 1s 0.6s forwards;
     }
 
@@ -203,7 +203,7 @@
     }
 
     @keyframes sealReveal {
-      from { opacity: 0; transform: translateY(10px); }
+      from { opacity: 0.6; transform: translateY(10px); }
       to { opacity: 1; transform: translateY(0); }
     }
 
@@ -325,7 +325,7 @@
       pointer-events: none;
       animation: spinText 15s linear infinite;
       z-index: 0;
-      opacity: 0;
+      opacity: 0.6;
       transition: opacity 1s ease;
     }
 
@@ -384,17 +384,8 @@
 
     .profile__photo:active { cursor: grabbing; }
     .profile__photo.dragging { cursor: grabbing; transition: none; }
-
-    .profile__placeholder {
-      font-size: clamp(2.5rem, 6vw, 4rem);
-      font-weight: 700;
-      color: var(--accent);
-      letter-spacing: 0.05em;
-      pointer-events: none;
-    }
-
-    .profile__hint {
-      display: none;
+.profile__hint {
+      display: block;
     }
 
     /* ============================================================
@@ -870,7 +861,7 @@
        SCROLL REVEAL
        ============================================================ */
     .reveal {
-      opacity: 0;
+      opacity: 0.6;
       transform: translateY(28px);
       transition: opacity 0.8s cubic-bezier(0.22, 0.61, 0.36, 1),
                   transform 0.8s cubic-bezier(0.22, 0.61, 0.36, 1);
@@ -901,9 +892,9 @@
       }
 
       .specialties__title { text-align: left; }
-      .specialties__title-accent { display: none; }
+      .specialties__title-accent { display: block; }
 
-      .header__nav { display: none; }
+      .header__nav { display: block; }
 
       .raun__book { width: min(70%, 280px); }
       .raun__title-float--tl { left: 4%; font-size: 1.5rem; }
@@ -997,7 +988,7 @@
             <svg viewBox="0 0 120 120">
               <path id="circlePath" d="M 60, 60 m -50, 0 a 50,50 0 1,1 100,0 a 50,50 0 1,1 -100,0" fill="none" />
               <text>
-                <textPath href="#circlePath" startOffset="0%" textLength="314" lengthAdjust="spacing">ARRÁSTRAME • INTERACTÚA • ARRÁSTRAME • INTERACTÚA • </textPath>
+                <textPath href="#circlePath" startOffset="0%" textLength="314" lengthAdjust="spacing">Funciona en PC • INTERACTÚA • Funciona en PC • INTERACTÚA • </textPath>
               </text>
             </svg>
           </div>
