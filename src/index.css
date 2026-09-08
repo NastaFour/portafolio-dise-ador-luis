@@ -112,6 +112,13 @@
   touch-action: pan-y !important;
 }
 
+@media (max-width: 768px) {
+  .spline-container canvas {
+    pointer-events: none !important;
+    touch-action: pan-y !important;
+  }
+}
+
 /* Custom editorial styles */
 .font-display {
   font-family: var(--font-display);

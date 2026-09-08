@@ -63,8 +63,35 @@ if (typeof window !== 'undefined' && Application?.prototype) {
 }
 
 function HeroSplineBackground() {
+  const containerRef = useRef<HTMLDivElement>(null);
+  const splineAppRef = useRef<any>(null);
+
   const handleSplineLoad = (splineApp: any) => {
+    splineAppRef.current = splineApp;
     try {
+      const isMobile =
+        typeof window !== 'undefined' &&
+        (window.innerWidth < 768 || /Mobi|Android|iPhone|iPad/i.test(navigator.userAgent));
+
+      // OPTIMIZACIÓN MÓVIL 1: Reducir pixelRatio a 1 (evita renderizar a resolución 3x retina innecesaria)
+      // Esto disminuye en más del 70% la carga de cálculo de shaders en la GPU del teléfono.
+      if (isMobile && splineApp?._renderer) {
+        splineApp._renderer.setPixelRatio?.(1);
+        if (splineApp._renderer.setSize && splineApp._canvas) {
+          splineApp._renderer.setSize(
+            splineApp._canvas.clientWidth,
+            splineApp._canvas.clientHeight,
+            false
+          );
+        }
+      }
+
+      // OPTIMIZACIÓN MÓVIL 2: En teléfonos, anular interacción en canvas para scroll nativo sin raycasting
+      if (isMobile && splineApp?._canvas) {
+        splineApp._canvas.style.pointerEvents = 'none';
+        splineApp._canvas.style.touchAction = 'pan-y';
+      }
+
       if (splineApp?._renderer?.pipeline) {
         const p = splineApp._renderer.pipeline;
         if (p.logoOverlayPass) {
@@ -97,6 +124,32 @@ function HeroSplineBackground() {
       console.warn('Spline onLoad watermark suppression:', err);
     }
   };
+
+  // OPTIMIZACIÓN MÓVIL 3: Pausar Spline cuando el Hero no esté visible en pantalla
+  useEffect(() => {
+    const el = containerRef.current;
+    if (!el || typeof IntersectionObserver === 'undefined') return;
+
+    const observer = new IntersectionObserver(
+      ([entry]) => {
+        const app = splineAppRef.current;
+        if (!app) return;
+        if (!entry.isIntersecting) {
+          try {
+            app.stop?.();
+          } catch {}
+        } else {
+          try {
+            app.play?.();
+          } catch {}
+        }
+      },
+      { threshold: 0.05 }
+    );
+
+    observer.observe(el);
+    return () => observer.disconnect();
+  }, []);
 
   useEffect(() => {
     const purgeWatermark = () => {
@@ -134,6 +187,7 @@ function HeroSplineBackground() {
 
   return (
     <div
+      ref={containerRef}
       className="relative w-full h-[100dvh] min-h-[100dvh] pointer-events-auto overflow-hidden spline-container"
       style={{
         position: 'relative',
