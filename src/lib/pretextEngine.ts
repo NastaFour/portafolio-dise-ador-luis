@@ -55,7 +55,8 @@ export class PretextFlowTarget {
     hasDropcap: boolean = false,
     hPad: number = 8,
     vPad: number = 3,
-    dropcapWidth: number = 60
+    dropcapWidth: number = 60,
+    minSlotWidth: number = 20
   ): ReflowLine[] {
     if (!this.prepared) {
       this.prepare();
@@ -93,7 +94,11 @@ export class PretextFlowTarget {
         blocked.push({ left: 0, right: dropcapWidth });
       }
 
-      const slots = carveTextLineSlots({ left: 0, right: containerW }, blocked);
+      const slots = carveTextLineSlots(
+        { left: 0, right: containerW },
+        blocked,
+        minSlotWidth
+      );
       if (slots.length === 0) {
         lineY += this.lineH;
         continue;
@@ -104,7 +109,7 @@ export class PretextFlowTarget {
       for (let si = 0; si < slots.length; si++) {
         const slot = slots[si];
         const slotWidth = slot.right - slot.left;
-        if (slotWidth < 20) continue;
+        if (slotWidth < minSlotWidth) continue;
 
         const layoutResult = layoutNextLine(this.prepared, cursor, slotWidth);
         if (!layoutResult) {

@@ -97,18 +97,54 @@ export const PretextCurlingSection: React.FC<PretextCurlingSectionProps> = ({
     const w = rect.width;
     const h = rect.height;
 
-    setIsMobile(w < 768);
+    const isSmall = w < 640;
+    setIsMobile(isSmall);
+
+    // Escalar el radio de los nodos para que en móvil encajen con elegancia y proporción
+    const radiusScale = isSmall ? Math.max(0.62, Math.min(0.85, w / 480)) : 1;
 
     setNodes((prevNodes) =>
       prevNodes.map((node) => {
         const config = DISCIPLINE_NODES.find((d) => d.id === node.id);
         if (!config) return node;
 
-        const posX = (config.initialX / 100) * w;
-        const posY = (config.initialY / 100) * h;
+        // En pantallas móviles, distribuir los nodos en las franjas laterales
+        // para mantener despejado el corredor central de lectura
+        let initXPercent = config.initialX;
+        let initYPercent = config.initialY;
+
+        if (isSmall) {
+          switch (config.id) {
+            case 'node-profile':
+              initXPercent = 82;
+              initYPercent = 14;
+              break;
+            case 'node-raun':
+              initXPercent = 18;
+              initYPercent = 34;
+              break;
+            case 'node-dolores':
+              initXPercent = 82;
+              initYPercent = 52;
+              break;
+            case 'node-ironwall':
+              initXPercent = 18;
+              initYPercent = 70;
+              break;
+            case 'node-legion':
+              initXPercent = 82;
+              initYPercent = 88;
+              break;
+          }
+        }
+
+        const posX = (initXPercent / 100) * w;
+        const posY = (initYPercent / 100) * h;
+        const scaledRadius = Math.round(config.radius * radiusScale);
 
         return {
           ...node,
+          radius: scaledRadius,
           x: posX,
           y: posY,
           restX: posX,
@@ -214,8 +250,14 @@ export const PretextCurlingSection: React.FC<PretextCurlingSectionProps> = ({
       }
 
       if (obstacles.length > 0) {
-        // Ceñido horizontal suave (hPad: 8px, vPad: 3px) "pegado al círculo"
-        const lines = target.reflow(pWidth, obstacles, hasDropcap, 8, 3, 56);
+        const isSmall = containerRect.width < 640;
+        const hPad = isSmall ? 6 : 8;
+        const vPad = isSmall ? 2 : 3;
+        const dropcapW = isSmall ? 40 : 56;
+        const minSlotWidth = isSmall ? Math.max(65, pWidth * 0.22) : 35;
+
+        // Ceñido horizontal suave con padding y ancho de slot calibrado para móviles
+        const lines = target.reflow(pWidth, obstacles, hasDropcap, hPad, vPad, dropcapW, minSlotWidth);
         if (lines.length > 0) {
           overlayEl.style.display = 'block';
           baseTextEl.style.opacity = '0';
@@ -472,19 +514,19 @@ export const PretextCurlingSection: React.FC<PretextCurlingSectionProps> = ({
           ref={containerRef}
           onPointerMove={handlePointerMove}
           onPointerUp={handlePointerUp}
-          className="relative min-h-[20rem] md:min-h-[36rem] rounded-2xl border border-white/10 bg-gradient-to-b from-neutral-900/60 to-neutral-950/80 p-5 sm:p-8 md:p-12 backdrop-blur-xl overflow-hidden shadow-2xl"
+          className="relative min-h-[38rem] sm:min-h-[36rem] md:min-h-[36rem] rounded-2xl border border-white/10 bg-gradient-to-b from-neutral-900/60 to-neutral-950/80 p-4 sm:p-8 md:p-12 backdrop-blur-xl overflow-hidden shadow-2xl"
         >
           {/* Texto del Manifiesto Editorial con Reflow Pretext */}
           <div
             ref={textContainerRef}
-            className="relative z-10 max-w-3xl space-y-6 pointer-events-none"
+            className="relative z-10 max-w-3xl space-y-5 sm:space-y-6 pointer-events-none"
           >
             {/* Párrafo 1 con Letra Capital */}
             <p
               ref={p1Ref}
-              className="relative text-lg sm:text-xl md:text-2xl text-neutral-200 font-display leading-relaxed"
+              className="relative text-base sm:text-xl md:text-2xl text-neutral-200 font-display leading-relaxed"
             >
-              <span className="dropcap__letter float-left text-5xl sm:text-6xl font-bold font-display text-[#C84B31] leading-none pr-3 pt-1 select-none">
+              <span className="dropcap__letter float-left text-4xl sm:text-6xl font-bold font-display text-[#C84B31] leading-none pr-2.5 sm:pr-3 pt-1 select-none">
                 {dropcapLetter}
               </span>
               <span ref={p1BaseRef} className="select-none transition-opacity duration-150">
@@ -500,7 +542,7 @@ export const PretextCurlingSection: React.FC<PretextCurlingSectionProps> = ({
             {/* Párrafo 2 con Reflow Pretext */}
             <p
               ref={p2Ref}
-              className="relative text-base sm:text-lg text-neutral-400 font-sans leading-relaxed"
+              className="relative text-sm sm:text-lg text-neutral-400 font-sans leading-relaxed"
             >
               <span ref={p2BaseRef} className="select-none transition-opacity duration-150">
                 {p2FullText}
@@ -513,136 +555,98 @@ export const PretextCurlingSection: React.FC<PretextCurlingSectionProps> = ({
             </p>
 
             {/* Indicador de Interacción */}
-            <div className="pt-4 text-xs tracking-wider text-neutral-500 uppercase flex items-center gap-2">
+            <div className="pt-3 sm:pt-4 text-xs tracking-wider text-neutral-500 uppercase flex items-center gap-2">
               <span className="inline-block w-2 h-2 rounded-full bg-[#C84B31]/70 animate-pulse" />
               {manifesto.hint}
             </div>
           </div>
 
-          {/* Nodos Circulares Interactivos Flotantes con Logos y Obras Reales */}
-          {!isMobile &&
-            nodes.map((node) => {
-              const info = DISCIPLINE_NODES.find((d) => d.id === node.id);
-              if (!info) return null;
+          {/* Nodos Circulares Interactivos Flotantes (Visibles e Interactivos en Móvil y Desktop) */}
+          {nodes.map((node) => {
+            const info = DISCIPLINE_NODES.find((d) => d.id === node.id);
+            if (!info) return null;
 
-              const isHovered = hoveredNodeId === node.id;
-              const isProject = info.category === 'project';
-              const project = isProject
-                ? PORTFOLIO_PROJECTS.find((p) => p.id === info.projectId)
-                : null;
+            const isHovered = hoveredNodeId === node.id;
+            const isProject = info.category === 'project';
+            const project = isProject
+              ? PORTFOLIO_PROJECTS.find((p) => p.id === info.projectId)
+              : null;
 
-              return (
+            return (
+              <div
+                key={node.id}
+                onPointerDown={(e) => handlePointerDown(node.id, e)}
+                onMouseEnter={() => setHoveredNodeId(node.id)}
+                onMouseLeave={() => setHoveredNodeId(null)}
+                onClick={() => handleNodeClick(project)}
+                onDoubleClick={() => {
+                  if (project) onSelectProject(project);
+                }}
+                style={{
+                  touchAction: 'none',
+                  transform: `translate3d(${node.x - node.radius}px, ${node.y - node.radius}px, 0)`,
+                  width: `${node.radius * 2}px`,
+                  height: `${node.radius * 2}px`,
+                  transition: isResetting
+                    ? 'transform 0.6s cubic-bezier(0.25, 1, 0.5, 1)'
+                    : 'box-shadow 0.2s ease',
+                }}
+                className={`group absolute top-0 left-0 rounded-full cursor-grab active:cursor-grabbing z-20 select-none shadow-2xl transition-transform ${
+                  isHovered ? 'scale-105 z-30' : ''
+                }`}
+              >
+                {/* Contenedor Circular con Imagen Real y Borde de Color */}
                 <div
-                  key={node.id}
-                  onPointerDown={(e) => handlePointerDown(node.id, e)}
-                  onMouseEnter={() => setHoveredNodeId(node.id)}
-                  onMouseLeave={() => setHoveredNodeId(null)}
-                  onClick={() => handleNodeClick(project)}
-                  onDoubleClick={() => {
-                    if (project) onSelectProject(project);
-                  }}
+                  className="relative w-full h-full rounded-full overflow-hidden border-2 shadow-2xl transition-colors duration-300"
                   style={{
-                    transform: `translate3d(${node.x - node.radius}px, ${node.y - node.radius}px, 0)`,
-                    width: `${node.radius * 2}px`,
-                    height: `${node.radius * 2}px`,
-                    transition: isResetting
-                      ? 'transform 0.6s cubic-bezier(0.25, 1, 0.5, 1)'
-                      : 'box-shadow 0.2s ease',
+                    borderColor: isHovered ? '#C84B31' : `${info.color}88`,
+                    boxShadow: isHovered
+                      ? `0 0 25px ${info.color}66, 0 10px 30px rgba(0,0,0,0.8)`
+                      : '0 8px 24px rgba(0,0,0,0.6)',
                   }}
-                  className={`group absolute top-0 left-0 rounded-full cursor-grab active:cursor-grabbing z-20 select-none shadow-2xl transition-transform ${
-                    isHovered ? 'scale-105 z-30' : ''
-                  }`}
                 >
-                  {/* Contenedor Circular con Imagen Real y Borde de Color */}
-                  <div
-                    className="relative w-full h-full rounded-full overflow-hidden border-2 shadow-2xl transition-colors duration-300"
-                    style={{
-                      borderColor: isHovered ? '#C84B31' : `${info.color}88`,
-                      boxShadow: isHovered
-                        ? `0 0 25px ${info.color}66, 0 10px 30px rgba(0,0,0,0.8)`
-                        : '0 8px 24px rgba(0,0,0,0.6)',
-                    }}
-                  >
-                    {/* Imagen / Logo Real del Proyecto */}
-                    <img
-                      src={info.image}
-                      alt={info.name[lang]}
-                      className="w-full h-full object-cover select-none pointer-events-none transition-transform duration-500 group-hover:scale-110"
-                      draggable={false}
-                    />
+                  {/* Imagen / Logo Real del Proyecto */}
+                  <img
+                    src={info.image}
+                    alt={info.name[lang]}
+                    className="w-full h-full object-cover select-none pointer-events-none transition-transform duration-500 group-hover:scale-110"
+                    draggable={false}
+                  />
 
-                    {/* Máscara de gradiente editorial para legibilidad del título */}
-                    <div className="absolute inset-0 bg-gradient-to-t from-black/90 via-black/30 to-transparent pointer-events-none" />
+                  {/* Máscara de gradiente editorial para legibilidad del título */}
+                  <div className="absolute inset-0 bg-gradient-to-t from-black/90 via-black/30 to-transparent pointer-events-none" />
 
-                    {/* Titular y año del proyecto al pie del nodo */}
-                    <div className="absolute bottom-2 left-0 right-0 px-2 flex flex-col items-center text-center pointer-events-none">
-                      <span className="text-[10px] sm:text-[11px] font-bold text-white tracking-tight drop-shadow line-clamp-1">
-                        {info.name[lang]}
-                      </span>
-                      {info.year && (
-                        <span className="text-[8px] sm:text-[9px] text-neutral-300 font-mono font-medium tracking-wider">
-                          {info.year}
-                        </span>
-                      )}
-                    </div>
-                  </div>
-
-                  {/* Micro-tooltip flotante en Hover */}
-                  {isHovered && isProject && (
-                    <div className="absolute -top-9 left-1/2 -translate-x-1/2 px-3 py-1 bg-neutral-900/95 border border-white/20 rounded-full text-[10px] text-white whitespace-nowrap shadow-2xl backdrop-blur-md flex items-center gap-1.5 pointer-events-none animate-in fade-in zoom-in-95">
-                      <span>{lang === 'es' ? 'Clic para ver caso' : 'Click to inspect'}</span>
-                      <ExternalLink className="w-2.5 h-2.5 text-[#C84B31]" />
-                    </div>
-                  )}
-
-                  {/* Tooltip de Luis Autor */}
-                  {isHovered && !isProject && (
-                    <div className="absolute -top-9 left-1/2 -translate-x-1/2 px-3 py-1 bg-neutral-900/95 border border-[#C84B31]/40 rounded-full text-[10px] text-white whitespace-nowrap shadow-2xl backdrop-blur-md flex items-center gap-1.5 pointer-events-none animate-in fade-in zoom-in-95">
-                      <span>Luis Bermúdez • Autor</span>
-                    </div>
-                  )}
-                </div>
-              );
-            })}
-        </div>
-
-        {/* Fallback de Nodos para Móvil (<768px) */}
-        {isMobile && (
-          <div className="mt-6 grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 gap-2.5 sm:gap-3">
-            {DISCIPLINE_NODES.map((d) => {
-              const isProject = d.category === 'project';
-              const project = isProject
-                ? PORTFOLIO_PROJECTS.find((p) => p.id === d.projectId)
-                : null;
-
-              return (
-                <button
-                  key={d.id}
-                  onClick={() => project && onSelectProject(project)}
-                  className="p-3 rounded-xl border border-white/10 bg-white/5 flex items-center gap-3 text-left hover:border-[#C84B31]/50 transition group min-w-0"
-                >
-                  <div className="w-10 h-10 rounded-full overflow-hidden border border-white/20 shrink-0">
-                    <img
-                      src={d.image}
-                      alt={d.name[lang]}
-                      className="w-full h-full object-cover"
-                    />
-                  </div>
-                  <div className="min-w-0 flex-1">
-                    <span className="text-xs font-semibold text-white block group-hover:text-[#C84B31] truncate">
-                      {d.name[lang]}
+                  {/* Titular y año del proyecto al pie del nodo */}
+                  <div className="absolute bottom-1.5 sm:bottom-2 left-0 right-0 px-1 sm:px-2 flex flex-col items-center text-center pointer-events-none">
+                    <span className="text-[9px] sm:text-[11px] font-bold text-white tracking-tight drop-shadow line-clamp-1">
+                      {info.name[lang]}
                     </span>
-                    {d.year && (
-                      <span className="text-[10px] text-neutral-400 font-mono block">
-                        {d.year}
+                    {info.year && (
+                      <span className="text-[7px] sm:text-[9px] text-neutral-300 font-mono font-medium tracking-wider">
+                        {info.year}
                       </span>
                     )}
                   </div>
-                </button>
-              );
-            })}
-          </div>
-        )}
+                </div>
+
+                {/* Micro-tooltip flotante en Hover */}
+                {isHovered && isProject && (
+                  <div className="absolute -top-9 left-1/2 -translate-x-1/2 px-3 py-1 bg-neutral-900/95 border border-white/20 rounded-full text-[10px] text-white whitespace-nowrap shadow-2xl backdrop-blur-md flex items-center gap-1.5 pointer-events-none animate-in fade-in zoom-in-95">
+                    <span>{lang === 'es' ? 'Clic para ver caso' : 'Click to inspect'}</span>
+                    <ExternalLink className="w-2.5 h-2.5 text-[#C84B31]" />
+                  </div>
+                )}
+
+                {/* Tooltip de Luis Autor */}
+                {isHovered && !isProject && (
+                  <div className="absolute -top-9 left-1/2 -translate-x-1/2 px-3 py-1 bg-neutral-900/95 border border-[#C84B31]/40 rounded-full text-[10px] text-white whitespace-nowrap shadow-2xl backdrop-blur-md flex items-center gap-1.5 pointer-events-none animate-in fade-in zoom-in-95">
+                    <span>Luis Bermúdez • Autor</span>
+                  </div>
+                )}
+              </div>
+            );
+          })}
+        </div>
       </div>
     </section>
   );
