@@ -1,162 +1,308 @@
-import React from 'react';
-import { ArrowDown, Sparkles, FolderOpen, Mail } from 'lucide-react';
+import { useEffect, useRef } from 'react';
+import Spline from '@splinetool/react-spline';
+import { Application } from '@splinetool/runtime';
+
+// Neutralización a nivel de runtime WebGL de Spline:
+// 1. Eliminar 'SplineWatermark' del mapa de imágenes decodificadas antes de que el pipeline configure la textura.
+if (typeof window !== 'undefined' && Application?.prototype) {
+  try {
+    Object.defineProperty(Application.prototype, '_data', {
+      get() {
+        return (this as any).__realSplineData;
+      },
+      set(val: any) {
+        if (val?.shared?.images?.SplineWatermark) {
+          delete val.shared.images.SplineWatermark;
+        }
+        (this as any).__realSplineData = val;
+      },
+      configurable: true,
+    });
+
+    const originalStart = Application.prototype.start;
+    Application.prototype.start = async function (data: any, options: any) {
+      const result = await originalStart.call(this, data, options);
+      try {
+        const app = this as any;
+        if (app._renderer?.pipeline) {
+          const p = app._renderer.pipeline;
+          if (p.logoOverlayPass) {
+            p.logoOverlayPass.enabled = false;
+            Object.defineProperty(p.logoOverlayPass, 'enabled', {
+              get: () => false,
+              set: () => {},
+              configurable: true,
+            });
+          }
+          if (p.effectComposer?.passes) {
+            const idx = p.effectComposer.passes.indexOf(p.logoOverlayPass);
+            if (idx !== -1) {
+              p.effectComposer.passes.splice(idx, 1);
+            }
+          }
+          p.setWatermark = () => {};
+          p.updateRenderToScreen?.();
+        }
+        const watermarkObj = app.findObjectByName?.('SplineWatermark');
+        if (watermarkObj) {
+          watermarkObj.visible = false;
+          if (watermarkObj.scale) {
+            watermarkObj.scale.x = 0;
+            watermarkObj.scale.y = 0;
+            watermarkObj.scale.z = 0;
+          }
+        }
+      } catch (e) {
+        // Ignorar fallbacks silenciosos
+      }
+      return result;
+    };
+  } catch (e) {
+    console.warn('Spline runtime patch failed:', e);
+  }
+}
+
+function HeroSplineBackground() {
+  const handleSplineLoad = (splineApp: any) => {
+    try {
+      if (splineApp?._renderer?.pipeline) {
+        const p = splineApp._renderer.pipeline;
+        if (p.logoOverlayPass) {
+          p.logoOverlayPass.enabled = false;
+          Object.defineProperty(p.logoOverlayPass, 'enabled', {
+            get: () => false,
+            set: () => {},
+            configurable: true,
+          });
+        }
+        if (p.effectComposer?.passes) {
+          const idx = p.effectComposer.passes.indexOf(p.logoOverlayPass);
+          if (idx !== -1) {
+            p.effectComposer.passes.splice(idx, 1);
+          }
+        }
+        p.setWatermark = () => {};
+        p.updateRenderToScreen?.();
+      }
+      const watermarkObj = splineApp.findObjectByName?.('SplineWatermark');
+      if (watermarkObj) {
+        watermarkObj.visible = false;
+        if (watermarkObj.scale) {
+          watermarkObj.scale.x = 0;
+          watermarkObj.scale.y = 0;
+          watermarkObj.scale.z = 0;
+        }
+      }
+    } catch (err) {
+      console.warn('Spline onLoad watermark suppression:', err);
+    }
+  };
+
+  useEffect(() => {
+    const purgeWatermark = () => {
+      // 1. Quitar enlaces y logos de Spline en el DOM estándar
+      const elements = document.querySelectorAll(
+        'a[href*="spline.design"], #spline, [class*="spline-watermark"], .spline-watermark, #spline-watermark, [aria-label*="Spline"], #logo'
+      );
+      elements.forEach((el) => el.remove());
+
+      // 2. Revisar shadow roots de Web Components (spline-viewer)
+      const viewers = document.querySelectorAll('spline-viewer');
+      viewers.forEach((v) => {
+        if (v.shadowRoot) {
+          const shadowEls = v.shadowRoot.querySelectorAll('a, #logo, [class*="watermark"]');
+          shadowEls.forEach((el) => el.remove());
+        }
+      });
+    };
+
+    purgeWatermark();
+    const interval = setInterval(purgeWatermark, 100);
+    const observer = new MutationObserver(purgeWatermark);
+    observer.observe(document.body, { childList: true, subtree: true });
+
+    const timer = setTimeout(() => {
+      clearInterval(interval);
+    }, 12000);
+
+    return () => {
+      clearInterval(interval);
+      clearTimeout(timer);
+      observer.disconnect();
+    };
+  }, []);
+
+  return (
+    <div
+      className="relative w-full h-[100dvh] min-h-[100dvh] pointer-events-auto overflow-hidden spline-container"
+      style={{
+        position: 'relative',
+        width: '100%',
+        height: '100dvh',
+        pointerEvents: 'auto',
+        overflow: 'hidden',
+      }}
+    >
+      <Spline
+        onLoad={handleSplineLoad}
+        style={{
+          width: '100%',
+          height: '100dvh',
+          pointerEvents: 'auto',
+        }}
+        scene="https://prod.spline.design/dJqTIQ-tE3ULUPMi/scene.splinecode"
+      />
+      {/* Máscara de gradiente editorial cálido */}
+      <div
+        style={{
+          position: 'absolute',
+          top: 0,
+          left: 0,
+          width: '100%',
+          height: '100dvh',
+          background: `
+            linear-gradient(to right, rgba(17, 17, 17, 0.9) 0%, rgba(17, 17, 17, 0.4) 40%, rgba(17, 17, 17, 0.4) 60%, rgba(17, 17, 17, 0.9) 100%),
+            linear-gradient(to bottom, transparent 60%, rgba(17, 17, 17, 1) 100%)
+          `,
+          pointerEvents: 'none',
+        }}
+      />
+
+      {/* Degradado inferior envolvente hacia el fondo de la página */}
+      <div
+        aria-hidden="true"
+        className="absolute bottom-0 left-0 right-0 h-32 bg-gradient-to-t from-[#111111] via-[#111111]/90 to-transparent pointer-events-none z-20"
+      />
+
+      {/* Tapa física opaca infalible en la esquina inferior derecha */}
+      <div
+        aria-hidden="true"
+        className="absolute bottom-0 right-0 w-72 h-24 pointer-events-none z-30"
+        style={{
+          background: 'radial-gradient(ellipse at 100% 100%, #111111 65%, rgba(17, 17, 17, 0.95) 85%, transparent 100%)',
+        }}
+      />
+      <div
+        aria-hidden="true"
+        className="absolute bottom-0 right-0 w-52 h-16 bg-[#111111] pointer-events-none z-30"
+      />
+    </div>
+  );
+}
+
+interface HeroContentProps {
+  lang?: 'es' | 'en';
+}
+
+function HeroContent({ lang = 'es' }: HeroContentProps) {
+  return (
+    <div className="text-white px-4 sm:px-8 max-w-6xl mx-auto w-full flex flex-col lg:flex-row justify-between items-start lg:items-center pt-24 pb-12 sm:py-16 gap-6 sm:gap-8">
+      {/* Columna Izquierda con Foto y Nombre */}
+      <div className="w-full lg:w-3/5">
+        {/* Foto Perfil de Luis Bermúdez (Proporcional en móviles y desktop) */}
+        <div className="relative w-28 h-28 sm:w-44 sm:h-44 md:w-52 md:h-52 rounded-full overflow-hidden border-2 border-[#C84B31] shadow-[0_0_40px_rgba(200,75,49,0.35)] mb-4 sm:mb-8 transition-transform duration-500 hover:scale-105">
+          <img
+            src="/PERFIL.jpg"
+            alt="Luis Bermúdez"
+            className="w-full h-full object-cover"
+          />
+        </div>
+
+        <h1 className="text-3xl sm:text-5xl lg:text-7xl font-bold font-display leading-[1.08] tracking-tight text-[#E8E4DC]">
+          Luis Bermúdez
+        </h1>
+
+        <div className="text-[11px] sm:text-sm tracking-widest text-[#C84B31] font-semibold mt-3 sm:mt-4 uppercase">
+          {lang === 'es'
+            ? 'Animación 2D & 3D / Motion Graphics / Dirección de Arte / Editorial'
+            : '2D & 3D Animation / Motion Graphics / Art Direction / Editorial'}
+        </div>
+      </div>
+
+      {/* Columna Derecha: Manifiesto Corto & Acciones */}
+      <div className="w-full lg:w-2/5 flex flex-col items-start lg:items-end lg:text-right">
+        <p className="text-sm sm:text-lg text-neutral-300 opacity-90 mb-6 sm:mb-8 max-w-md font-sans leading-relaxed">
+          {lang === 'es'
+            ? 'Creando animaciones 2D/3D, piezas tridimensionales y narrativas visuales desde el orden, la mitología y la estética contemporánea.'
+            : 'Crafting 2D/3D animations, volumetric forms, and visual narratives rooted in order, mythology, and contemporary aesthetics.'}
+        </p>
+
+        <div className="flex pointer-events-auto flex-col sm:flex-row items-stretch sm:items-center gap-2.5 sm:gap-3 w-full sm:w-auto">
+          <a
+            href="#contacto"
+            className="border border-white/40 text-white font-medium py-3 px-6 sm:px-7 rounded-full transition duration-300 hover:bg-white hover:text-black text-center text-xs uppercase tracking-wider backdrop-blur-sm"
+          >
+            {lang === 'es' ? 'Iniciar Conversación' : 'Start Conversation'}
+          </a>
+          <a
+            href="#proyectos"
+            className="bg-[#C84B31] text-white font-semibold py-3 px-6 sm:px-7 rounded-full transition duration-300 hover:bg-[#b03f27] hover:scale-105 flex items-center justify-center text-center text-xs uppercase tracking-wider shadow-lg"
+          >
+            {lang === 'es' ? 'Ver Proyectos' : 'View Works'}
+          </a>
+        </div>
+      </div>
+    </div>
+  );
+}
 
 interface HeroSectionProps {
   lang?: 'es' | 'en';
 }
 
-export const HeroSection: React.FC<HeroSectionProps> = ({ lang = 'es' }) => {
+const HeroSection: React.FC<HeroSectionProps> = ({ lang = 'es' }) => {
+  const heroContentRef = useRef<HTMLDivElement>(null);
+
+  useEffect(() => {
+    let ticking = false;
+    const handleScroll = () => {
+      if (!ticking) {
+        window.requestAnimationFrame(() => {
+          const scrollPosition = window.pageYOffset;
+          const maxScroll = 450;
+          const opacity = Math.max(0, 1 - scrollPosition / maxScroll);
+          if (heroContentRef.current) {
+            heroContentRef.current.style.opacity = opacity.toString();
+          }
+          ticking = false;
+        });
+        ticking = true;
+      }
+    };
+    window.addEventListener('scroll', handleScroll, { passive: true });
+    return () => window.removeEventListener('scroll', handleScroll);
+  }, []);
+
   return (
-    <section className="relative w-full min-h-[92vh] flex items-center justify-center bg-[#111111] overflow-hidden pt-28 pb-16 px-4 sm:px-6 lg:px-8">
-      {/* Fondo de atmósfera editorial profunda con gradiente radial */}
-      <div
-        aria-hidden="true"
-        className="absolute inset-0 pointer-events-none"
-        style={{
-          background:
-            'radial-gradient(ellipse at 50% 35%, rgba(200, 75, 49, 0.08) 0%, rgba(20, 20, 20, 0.6) 45%, #111111 85%)',
-        }}
-      />
-
-      {/* Marca de agua monumental tipográfica en 2D (Monograma L // B de fondo) */}
-      <div
-        aria-hidden="true"
-        className="absolute inset-0 flex items-center justify-between px-6 pointer-events-none select-none z-0 overflow-hidden"
-      >
-        <span className="text-[18rem] sm:text-[26rem] lg:text-[34rem] font-display font-extrabold text-white/[0.015] leading-none -translate-x-12">
-          L
-        </span>
-        <span className="text-[18rem] sm:text-[26rem] lg:text-[34rem] font-display font-extrabold text-white/[0.015] leading-none translate-x-12">
-          B
-        </span>
-      </div>
-
-      {/* Retícula editorial sutil (Crosshairs en las esquinas del lienzo) */}
-      <div
-        aria-hidden="true"
-        className="absolute top-28 left-8 text-neutral-600/40 text-xs font-mono select-none pointer-events-none hidden sm:block"
-      >
-        + 00° 13' S / 78° 30' W
-      </div>
-      <div
-        aria-hidden="true"
-        className="absolute top-28 right-8 text-neutral-600/40 text-xs font-mono select-none pointer-events-none hidden sm:block"
-      >
-        ISTER // EDITORIAL
-      </div>
-
-      {/* Contenedor Principal */}
-      <div className="relative z-10 max-w-6xl mx-auto w-full flex flex-col justify-center">
-        {/* Badge superior de especialidad */}
-        <div className="flex items-center gap-2 px-3 py-1.5 rounded-full border border-white/10 bg-white/[0.03] backdrop-blur-sm w-fit mb-8 sm:mb-10">
-          <span className="w-2 h-2 rounded-full bg-[#C84B31] animate-pulse" />
-          <span className="text-[10px] sm:text-xs font-mono tracking-widest text-neutral-300 uppercase">
-            {lang === 'es'
-              ? 'Diseño Gráfico · After Effects · Dirección de Arte'
-              : 'Graphic Design · After Effects · Art Direction'}
-          </span>
+    <div className="relative bg-[#111111] overflow-hidden">
+      {/* Contenedor Spline 3D de Altura Completa con soporte viewport dinámico */}
+      <div className="relative h-[100dvh] min-h-[100dvh] w-full">
+        <div className="absolute inset-0 z-0 pointer-events-auto">
+          <HeroSplineBackground />
         </div>
 
-        {/* Composición Principal en Grilla Asimétrica */}
-        <div className="grid grid-cols-1 lg:grid-cols-12 gap-8 sm:gap-12 items-center">
-          {/* Columna Izquierda: Retrato Auténtico & Nombre Monumental */}
-          <div className="lg:col-span-7 space-y-6">
-            <div className="flex items-center gap-5 sm:gap-7">
-              {/* Foto de Perfil de Luis Bermúdez con Anillo Editorial */}
-              <div className="relative shrink-0 w-24 h-24 sm:w-32 sm:h-32 md:w-36 md:h-36 rounded-full overflow-hidden border-2 border-[#C84B31] ring-4 ring-[#C84B31]/20 shadow-[0_0_35px_rgba(200,75,49,0.3)] group">
-                <img
-                  src="/PERFIL.jpg"
-                  alt="Luis Bermúdez"
-                  className="w-full h-full object-cover select-none transition-transform duration-700 group-hover:scale-110"
-                />
-              </div>
-
-              {/* Títulos y Firma */}
-              <div>
-                <span className="text-xs font-mono text-[#C84B31] tracking-widest uppercase font-semibold block mb-1">
-                  {lang === 'es' ? 'Portafolio de Autor' : 'Author Portfolio'}
-                </span>
-                <h1 className="text-4xl sm:text-6xl lg:text-7xl font-display font-bold text-[#E8E4DC] tracking-tight leading-[1.05]">
-                  Luis Bermúdez
-                </h1>
-                <p className="text-sm sm:text-lg text-neutral-400 font-display italic mt-1.5">
-                  {lang === 'es'
-                    ? 'Tecnólogo Universitario en Diseño Gráfico & Producción Audiovisual'
-                    : 'University Technologist in Graphic Design & Audiovisual Production'}
-                </p>
-              </div>
-            </div>
-
-            {/* Disciplinas en Ledger Suizo */}
-            <div className="flex flex-wrap gap-2 pt-2">
-              {[
-                lang === 'es' ? 'After Effects' : 'After Effects',
-                lang === 'es' ? 'Diseño Editorial Shibui' : 'Shibui Editorial',
-                lang === 'es' ? 'Identidad de Marca' : 'Brand Identity',
-                lang === 'es' ? 'Producción Audiovisual' : 'Audiovisual Production',
-                lang === 'es' ? 'Retícula Suiza' : 'Swiss Grid Systems',
-              ].map((spec, i) => (
-                <span
-                  key={i}
-                  className="px-3 py-1 rounded-md text-[11px] sm:text-xs font-mono bg-white/[0.04] border border-white/5 text-neutral-300"
-                >
-                  {spec}
-                </span>
-              ))}
-            </div>
-          </div>
-
-          {/* Columna Derecha: Manifiesto Síntesis & Botones de Acción */}
-          <div className="lg:col-span-5 flex flex-col justify-between space-y-6 lg:pl-6 lg:border-l lg:border-white/10">
-            <p className="text-sm sm:text-base text-neutral-300 font-sans leading-relaxed">
-              {lang === 'es'
-                ? 'Concibo el diseño como un ejercicio de ordenación espacial y ritmo temporal. Forjo narrativas visuales, identidades corporativas y piezas cinemáticas basadas en la disciplina del mito nórdico Raun y la sobria elegancia japonesa Shibui.'
-                : 'I perceive design as an exercise in spatial structure and temporal rhythm. Crafting visual identities, cinematic motion pieces, and high-end publications rooted in the rigor of Norse Raun and Japanese Shibui restraint.'}
-            </p>
-
-            {/* Bloque de Acciones */}
-            <div className="flex flex-col sm:flex-row items-stretch sm:items-center gap-3 pt-2">
-              <a
-                href="#proyectos"
-                className="inline-flex items-center justify-center gap-2 px-6 py-3.5 rounded-full bg-[#C84B31] text-white font-medium text-xs uppercase tracking-wider transition-all duration-300 hover:bg-[#b03f27] hover:scale-[1.02] active:scale-95 shadow-lg shadow-[#C84B31]/20"
-              >
-                <FolderOpen className="w-4 h-4" />
-                <span>{lang === 'es' ? 'Explorar Proyectos' : 'Explore Works'}</span>
-              </a>
-              <a
-                href="#contacto"
-                className="inline-flex items-center justify-center gap-2 px-6 py-3.5 rounded-full border border-white/20 bg-white/[0.03] text-neutral-200 font-medium text-xs uppercase tracking-wider transition-all duration-300 hover:bg-white hover:text-black hover:border-white active:scale-95 backdrop-blur-sm"
-              >
-                <Mail className="w-4 h-4" />
-                <span>{lang === 'es' ? 'Iniciar Diálogo' : 'Get in Touch'}</span>
-              </a>
-            </div>
-
-            {/* Resumen de Trayectoria */}
-            <div className="pt-4 border-t border-white/10 flex items-center justify-between text-xs font-mono text-neutral-400">
-              <span>{lang === 'es' ? 'Graduado ISTER · Quito' : 'ISTER Graduate · Quito'}</span>
-              <span className="text-[#C84B31]">2024 — 2026</span>
-            </div>
-          </div>
-        </div>
-
-        {/* Indicador inferior de scroll */}
-        <div className="pt-12 sm:pt-16 flex items-center justify-between text-[11px] font-mono text-neutral-500">
-          <span className="flex items-center gap-2">
-            <Sparkles className="w-3.5 h-3.5 text-[#C84B31]" />
-            {lang === 'es' ? 'Manifiesto interactivo a continuación' : 'Interactive manifesto below'}
-          </span>
-          <a
-            href="#manifiesto"
-            className="flex items-center gap-1 text-neutral-400 hover:text-white transition-colors duration-200"
-          >
-            <span>{lang === 'es' ? 'Desplazar' : 'Scroll down'}</span>
-            <ArrowDown className="w-3.5 h-3.5 animate-bounce" />
-          </a>
+        <div
+          ref={heroContentRef}
+          style={{
+            position: 'absolute',
+            top: 0,
+            left: 0,
+            width: '100%',
+            height: '100%',
+            minHeight: '100dvh',
+            display: 'flex',
+            justifyContent: 'center',
+            alignItems: 'center',
+            zIndex: 10,
+            pointerEvents: 'none',
+          }}
+        >
+          <HeroContent lang={lang} />
         </div>
       </div>
-    </section>
+    </div>
   );
 };
 
+export { HeroSection };
 export default HeroSection;
