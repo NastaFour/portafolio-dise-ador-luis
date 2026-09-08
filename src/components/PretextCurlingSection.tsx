@@ -1,7 +1,6 @@
 import React, { useEffect, useRef, useState, useCallback } from 'react';
 import { RotateCcw, Sparkles, ExternalLink } from 'lucide-react';
 import {
-  calculateNodePhysics,
   resolveCircleCollisions,
   type PhysicsNode,
 } from '@/lib/pretextPhysics';
@@ -37,12 +36,12 @@ export const PretextCurlingSection: React.FC<PretextCurlingSectionProps> = ({
   const p1PoolRef = useRef<HTMLSpanElement[]>([]);
   const p2PoolRef = useRef<HTMLSpanElement[]>([]);
 
+  const hoveredNodeIdRef = useRef<string | null>(null);
   const [hoveredNodeId, setHoveredNodeId] = useState<string | null>(null);
   const [isResetting, setIsResetting] = useState(false);
-  const [isMobile, setIsMobile] = useState(false);
 
-  // Estado de los nodos físicos interactivos
-  const [nodes, setNodes] = useState<PhysicsNode[]>(() =>
+  // Nodos de física gestionados vía Ref para 60 FPS bloqueados sin reconciliación de React en rAF
+  const nodesRef = useRef<PhysicsNode[]>(
     DISCIPLINE_NODES.map((d) => ({
       id: d.id,
       x: 0,
@@ -53,16 +52,21 @@ export const PretextCurlingSection: React.FC<PretextCurlingSectionProps> = ({
       restX: 0,
       restY: 0,
       isDragging: false,
+      isResetting: false,
     }))
   );
+  const nodeDomRefs = useRef<Record<string, HTMLDivElement | null>>({});
 
-  // Control estricto de arrastre con física spring y momentum
+  // Estado reactivo solo para el montaje inicial y recálculo por resize
+  const [nodes, setNodes] = useState<PhysicsNode[]>(() => nodesRef.current);
+
+  // Control estricto de arrastre con física spring, momentum y soporte táctil móvil
   const dragTrackingRef = useRef<{
     id: string;
     startX: number;
     startY: number;
-    originX: number;
-    originY: number;
+    offsetX: number;
+    offsetY: number;
     hasDragged: boolean;
   } | null>(null);
 
@@ -90,78 +94,111 @@ export const PretextCurlingSection: React.FC<PretextCurlingSectionProps> = ({
     }
   }, [p1RemainingText, p2FullText]);
 
-  // Inicializar posiciones de nodos relativas al contenedor
+  // Inicializar posiciones de nodos relativas al contenedor con soporte móvil
   const initPositions = useCallback(() => {
     if (!containerRef.current) return;
     const rect = containerRef.current.getBoundingClientRect();
     const w = rect.width;
     const h = rect.height;
 
-    const isSmall = w < 640;
-    setIsMobile(isSmall);
+    if (w < 60 || h < 60) return;
 
+    const isSmall = w < 640;
     // Escalar el radio de los nodos para que en móvil encajen con elegancia y proporción
     const radiusScale = isSmall ? Math.max(0.62, Math.min(0.85, w / 480)) : 1;
 
-    setNodes((prevNodes) =>
-      prevNodes.map((node) => {
-        const config = DISCIPLINE_NODES.find((d) => d.id === node.id);
-        if (!config) return node;
+    const updatedNodes: PhysicsNode[] = nodesRef.current.map((node) => {
+      const config = DISCIPLINE_NODES.find((d) => d.id === node.id);
+      if (!config) return node;
 
-        // En pantallas móviles, distribuir los nodos en las franjas laterales
-        // para mantener despejado el corredor central de lectura
-        let initXPercent = config.initialX;
-        let initYPercent = config.initialY;
+      let initXPercent = config.initialX;
+      let initYPercent = config.initialY;
 
-        if (isSmall) {
-          switch (config.id) {
-            case 'node-profile':
-              initXPercent = 82;
-              initYPercent = 14;
-              break;
-            case 'node-raun':
-              initXPercent = 18;
-              initYPercent = 34;
-              break;
-            case 'node-dolores':
-              initXPercent = 82;
-              initYPercent = 52;
-              break;
-            case 'node-ironwall':
-              initXPercent = 18;
-              initYPercent = 70;
-              break;
-            case 'node-legion':
-              initXPercent = 82;
-              initYPercent = 88;
-              break;
-          }
+      if (isSmall) {
+        switch (config.id) {
+          case 'node-profile':
+            initXPercent = 80;
+            initYPercent = 14;
+            break;
+          case 'node-raun':
+            initXPercent = 20;
+            initYPercent = 34;
+            break;
+          case 'node-dolores':
+            initXPercent = 80;
+            initYPercent = 52;
+            break;
+          case 'node-ironwall':
+            initXPercent = 20;
+            initYPercent = 70;
+            break;
+          case 'node-legion':
+            initXPercent = 80;
+            initYPercent = 88;
+            break;
         }
+      }
 
-        const posX = (initXPercent / 100) * w;
-        const posY = (initYPercent / 100) * h;
-        const scaledRadius = Math.round(config.radius * radiusScale);
+      const scaledRadius = Math.round(config.radius * radiusScale);
+      const posX = Math.max(
+        scaledRadius + 6,
+        Math.min(w - scaledRadius - 6, (initXPercent / 100) * w)
+      );
+      const posY = Math.max(
+        scaledRadius + 6,
+        Math.min(h - scaledRadius - 6, (initYPercent / 100) * h)
+      );
 
-        return {
-          ...node,
-          radius: scaledRadius,
-          x: posX,
-          y: posY,
-          restX: posX,
-          restY: posY,
-          vx: 0,
-          vy: 0,
-        };
-      })
-    );
+      return {
+        ...node,
+        radius: scaledRadius,
+        x: posX,
+        y: posY,
+        restX: posX,
+        restY: posY,
+        vx: (Math.random() - 0.5) * 0.4,
+        vy: (Math.random() - 0.5) * 0.4,
+        isDragging: false,
+        isResetting: false,
+      };
+    });
+
+    nodesRef.current = updatedNodes;
+    setNodes(updatedNodes);
+
+    // Posicionamiento inmediato directo en el DOM para evitar saltos o retrasos
+    for (let i = 0; i < updatedNodes.length; i++) {
+      const n = updatedNodes[i];
+      const el = nodeDomRefs.current[n.id];
+      if (el) {
+        el.style.transform = `translate3d(${(n.x - n.radius).toFixed(2)}px, ${(n.y - n.radius).toFixed(2)}px, 0)`;
+      }
+    }
 
     setTimeout(setupPretextTargets, 60);
   }, [setupPretextTargets]);
 
   useEffect(() => {
     initPositions();
+
+    const container = containerRef.current;
+    let ro: ResizeObserver | null = null;
+    if (container && typeof ResizeObserver !== 'undefined') {
+      ro = new ResizeObserver((entries) => {
+        for (const entry of entries) {
+          if (entry.contentRect.width > 60 && entry.contentRect.height > 60) {
+            initPositions();
+          }
+        }
+      });
+      ro.observe(container);
+    }
+
     window.addEventListener('resize', initPositions);
-    return () => window.removeEventListener('resize', initPositions);
+    return () => {
+      if (ro) ro.disconnect();
+      window.removeEventListener('resize', initPositions);
+    };
   }, [initPositions]);
 
   useEffect(() => {
@@ -173,31 +210,26 @@ export const PretextCurlingSection: React.FC<PretextCurlingSectionProps> = ({
     }
   }, [lang, setupPretextTargets]);
 
-  // Restablecer posiciones y tipografía
+  // Restablecer posiciones suavemente con física de retorno activa (nunca congela las físicas)
   const handleReset = useCallback(() => {
     setIsResetting(true);
-    setNodes((prev) =>
-      prev.map((n) => ({
-        ...n,
-        x: n.restX,
-        y: n.restY,
-        vx: 0,
-        vy: 0,
-        isDragging: false,
-      }))
-    );
 
-    // Ocultar overlays de Pretext y restaurar texto base
-    if (p1OverlayRef.current) p1OverlayRef.current.style.display = 'none';
-    if (p2OverlayRef.current) p2OverlayRef.current.style.display = 'none';
-    if (p1BaseRef.current) p1BaseRef.current.style.opacity = '1';
-    if (p2BaseRef.current) p2BaseRef.current.style.opacity = '1';
-    if (p1Ref.current) p1Ref.current.style.minHeight = '';
-    if (p2Ref.current) p2Ref.current.style.minHeight = '';
+    const currentNodes = nodesRef.current;
+    for (let i = 0; i < currentNodes.length; i++) {
+      const n = currentNodes[i];
+      n.isDragging = false;
+      n.isResetting = true;
+      n.targetX = n.restX;
+      n.targetY = n.restY;
+    }
 
     dragTrackingRef.current = null;
     setHoveredNodeId(null);
-    setTimeout(() => setIsResetting(false), 600);
+    hoveredNodeIdRef.current = null;
+
+    setTimeout(() => {
+      setIsResetting(false);
+    }, 800);
   }, []);
 
   useEffect(() => {
@@ -318,145 +350,212 @@ export const PretextCurlingSection: React.FC<PretextCurlingSectionProps> = ({
     []
   );
 
-  // Bucle de física a 60 FPS con colisiones circulares y Pretext Line-Carving
+  // Bucle de física a 60 FPS con colisiones circulares, retorno elástico y Pretext Line-Carving
   useEffect(() => {
-    if (isMobile) return;
-
     let animId: number;
 
     const updatePhysics = () => {
-      if (!containerRef.current || isResetting) {
-        animId = requestAnimationFrame(updatePhysics);
-        return;
-      }
+      animId = requestAnimationFrame(updatePhysics);
 
-      const containerRect = containerRef.current.getBoundingClientRect();
+      const container = containerRef.current;
+      if (!container) return;
+      const containerRect = container.getBoundingClientRect();
       const w = containerRect.width;
       const h = containerRect.height;
+      if (w < 60 || h < 60) return;
 
-      setNodes((prevNodes) => {
-        // 1. Simulación de inercia y rebote en límites (con spring drag para nodos activos)
-        const updated = prevNodes.map((node) => {
-          const friction = hoveredNodeId === node.id ? 0.82 : 0.94;
-          return calculateNodePhysics(node, w, h, friction, 0.7, 0.22);
-        });
+      const currentNodes = nodesRef.current;
 
-        // 2. Colisiones elásticas entre círculos para evitar solapamientos
-        resolveCircleCollisions(updated);
+      for (let i = 0; i < currentNodes.length; i++) {
+        const node = currentNodes[i];
 
-        // 3. Pretext reflow horizontal ceñido al perímetro de los círculos
-        executeParagraphReflow(
-          p1Ref.current,
-          p1OverlayRef.current,
-          p1BaseRef.current,
-          p1TargetRef.current,
-          p1PoolRef.current,
-          updated,
-          containerRect,
-          true // hasDropcap
-        );
+        if (node.isDragging) {
+          node.isResetting = false;
+          const targetX = node.targetX ?? node.x;
+          const targetY = node.targetY ?? node.y;
+          const prevX = node.x;
+          const prevY = node.y;
 
-        executeParagraphReflow(
-          p2Ref.current,
-          p2OverlayRef.current,
-          p2BaseRef.current,
-          p2TargetRef.current,
-          p2PoolRef.current,
-          updated,
-          containerRect,
-          false // hasDropcap = false
-        );
+          // Seguimiento elástico inmediato al dedo/puntero
+          node.x += (targetX - node.x) * 0.28;
+          node.y += (targetY - node.y) * 0.28;
+          node.vx = node.x - prevX;
+          node.vy = node.y - prevY;
 
-        return updated;
-      });
+          // Delimitar dentro del contenedor
+          const r = node.radius;
+          node.x = Math.max(r + 4, Math.min(w - r - 4, node.x));
+          node.y = Math.max(r + 4, Math.min(h - r - 4, node.y));
+        } else if (node.isResetting) {
+          // Retorno suave tipo resorte a su posición original (sin congelar físicas)
+          const dx = node.restX - node.x;
+          const dy = node.restY - node.y;
+          node.vx = dx * 0.12;
+          node.vy = dy * 0.12;
+          node.x += node.vx;
+          node.y += node.vy;
 
-      animId = requestAnimationFrame(updatePhysics);
+          if (Math.abs(dx) < 1.0 && Math.abs(dy) < 1.0) {
+            node.x = node.restX;
+            node.y = node.restY;
+            // Preservar vida orgánica con deriva sutil al llegar
+            node.vx = (Math.random() - 0.5) * 0.4;
+            node.vy = (Math.random() - 0.5) * 0.4;
+            node.isResetting = false;
+          }
+        } else {
+          // Inercia, fricción y rebote en límites
+          const friction = hoveredNodeIdRef.current === node.id ? 0.88 : 0.95;
+          node.vx *= friction;
+          node.vy *= friction;
+
+          // Deriva sutil para mantener los círculos flotando orgánicamente
+          if (Math.abs(node.vx) < 0.04 && Math.abs(node.vy) < 0.04) {
+            node.vx += (Math.random() - 0.5) * 0.06;
+            node.vy += (Math.random() - 0.5) * 0.06;
+          }
+
+          node.x += node.vx;
+          node.y += node.vy;
+
+          const r = node.radius;
+          const bounce = 0.7;
+          if (node.x - r < 4) {
+            node.x = r + 4;
+            node.vx = -node.vx * bounce;
+          } else if (node.x + r > w - 4) {
+            node.x = w - r - 4;
+            node.vx = -node.vx * bounce;
+          }
+
+          if (node.y - r < 4) {
+            node.y = r + 4;
+            node.vy = -node.vy * bounce;
+          } else if (node.y + r > h - 4) {
+            node.y = h - r - 4;
+            node.vy = -node.vy * bounce;
+          }
+        }
+      }
+
+      // Colisiones elásticas entre círculos para evitar solapamientos
+      resolveCircleCollisions(currentNodes);
+
+      // Actualización directa del DOM transform en 60 FPS sin reconciliación de React
+      for (let i = 0; i < currentNodes.length; i++) {
+        const node = currentNodes[i];
+        const el = nodeDomRefs.current[node.id];
+        if (el) {
+          el.style.transform = `translate3d(${(node.x - node.radius).toFixed(2)}px, ${(node.y - node.radius).toFixed(2)}px, 0)`;
+        }
+      }
+
+      // Pretext reflow horizontal ceñido al contorno
+      executeParagraphReflow(
+        p1Ref.current,
+        p1OverlayRef.current,
+        p1BaseRef.current,
+        p1TargetRef.current,
+        p1PoolRef.current,
+        currentNodes,
+        containerRect,
+        true // hasDropcap
+      );
+
+      executeParagraphReflow(
+        p2Ref.current,
+        p2OverlayRef.current,
+        p2BaseRef.current,
+        p2TargetRef.current,
+        p2PoolRef.current,
+        currentNodes,
+        containerRect,
+        false // hasDropcap = false
+      );
     };
 
     animId = requestAnimationFrame(updatePhysics);
     return () => cancelAnimationFrame(animId);
-  }, [isMobile, isResetting, hoveredNodeId, executeParagraphReflow]);
+  }, [executeParagraphReflow]);
 
-  // Inicio de Arrastre con Pointer Events
+  // Inicio de Arrastre con Pointer Events (Touch móvil y Ratón unificados)
   const handlePointerDown = (id: string, e: React.PointerEvent) => {
-    if (isMobile) return;
-    (e.target as HTMLElement).setPointerCapture(e.pointerId);
+    try {
+      (e.currentTarget as HTMLElement).setPointerCapture(e.pointerId);
+    } catch {
+      // Safe ignore
+    }
 
-    const targetNode = nodes.find((n) => n.id === id);
-    if (!targetNode || !containerRef.current) return;
+    const container = containerRef.current;
+    if (!container) return;
+    const rect = container.getBoundingClientRect();
+    const px = e.clientX - rect.left;
+    const py = e.clientY - rect.top;
+
+    const node = nodesRef.current.find((n) => n.id === id);
+    if (!node) return;
 
     dragTrackingRef.current = {
       id,
       startX: e.clientX,
       startY: e.clientY,
-      originX: targetNode.x,
-      originY: targetNode.y,
+      offsetX: px - node.x,
+      offsetY: py - node.y,
       hasDragged: false,
     };
 
-    setNodes((prev) =>
-      prev.map((n) =>
-        n.id === id
-          ? {
-              ...n,
-              isDragging: true,
-              targetX: n.x,
-              targetY: n.y,
-              vx: 0,
-              vy: 0,
-            }
-          : n
-      )
-    );
+    node.isDragging = true;
+    node.isResetting = false;
+    node.targetX = node.x;
+    node.targetY = node.y;
+    node.vx = 0;
+    node.vy = 0;
   };
 
   // Movimiento de Arrastre fluido
   const handlePointerMove = (e: React.PointerEvent) => {
     if (!dragTrackingRef.current || !containerRef.current) return;
 
-    // Detectar si realmente se ha desplazado más de 5 píxeles (umbral de arrastre)
     const moveDist = Math.hypot(
       e.clientX - dragTrackingRef.current.startX,
       e.clientY - dragTrackingRef.current.startY
     );
-    if (moveDist > 5) {
+    if (moveDist > 4) {
       dragTrackingRef.current.hasDragged = true;
     }
 
-    const dx = e.clientX - dragTrackingRef.current.startX;
-    const dy = e.clientY - dragTrackingRef.current.startY;
-    const newTargetX = dragTrackingRef.current.originX + dx;
-    const newTargetY = dragTrackingRef.current.originY + dy;
+    const rect = containerRef.current.getBoundingClientRect();
+    const px = e.clientX - rect.left;
+    const py = e.clientY - rect.top;
 
-    // Solo actualizamos targetX y targetY; calculateNodePhysics mueve x, y suavemente vía spring en rAF
-    setNodes((prev) =>
-      prev.map((n) =>
-        n.id === dragTrackingRef.current?.id
-          ? { ...n, targetX: newTargetX, targetY: newTargetY }
-          : n
-      )
-    );
+    const node = nodesRef.current.find((n) => n.id === dragTrackingRef.current?.id);
+    if (node && node.isDragging) {
+      const r = node.radius;
+      const w = rect.width;
+      const h = rect.height;
+      node.targetX = Math.max(r + 4, Math.min(w - r - 4, px - dragTrackingRef.current.offsetX));
+      node.targetY = Math.max(r + 4, Math.min(h - r - 4, py - dragTrackingRef.current.offsetY));
+    }
   };
 
   // Fin de Arrastre con liberación de momentum
-  const handlePointerUp = () => {
+  const handlePointerUp = (e?: React.PointerEvent) => {
+    if (e) {
+      try {
+        (e.currentTarget as HTMLElement).releasePointerCapture(e.pointerId);
+      } catch {
+        // Safe ignore
+      }
+    }
     if (!dragTrackingRef.current) return;
     const dragId = dragTrackingRef.current.id;
-
-    setNodes((prev) =>
-      prev.map((n) => {
-        if (n.id === dragId) {
-          // Amplificar la velocidad capturada en el spring tick para un deslizamiento fluido con inercia
-          return {
-            ...n,
-            isDragging: false,
-            vx: n.vx * 1.8,
-            vy: n.vy * 1.8,
-          };
-        }
-        return n;
-      })
-    );
+    const node = nodesRef.current.find((n) => n.id === dragId);
+    if (node) {
+      node.isDragging = false;
+      // Amplificar la velocidad capturada en el spring tick para un deslizamiento fluido con inercia
+      node.vx = node.vx * 1.6;
+      node.vy = node.vy * 1.6;
+    }
 
     // Mantener hasDragged durante 120ms para bloquear disparos accidentales de onClick
     setTimeout(() => {
@@ -465,6 +564,15 @@ export const PretextCurlingSection: React.FC<PretextCurlingSectionProps> = ({
         dragTrackingRef.current = null;
       }
     }, 120);
+  };
+
+  const handlePointerCancel = (e: React.PointerEvent) => {
+    handlePointerUp(e);
+  };
+
+  const handleHoverChange = (id: string | null) => {
+    setHoveredNodeId(id);
+    hoveredNodeIdRef.current = id;
   };
 
   // Manejador exclusivo de Clic intencional (ignora arrastres)
@@ -514,7 +622,9 @@ export const PretextCurlingSection: React.FC<PretextCurlingSectionProps> = ({
           ref={containerRef}
           onPointerMove={handlePointerMove}
           onPointerUp={handlePointerUp}
-          className="relative min-h-[38rem] sm:min-h-[36rem] md:min-h-[36rem] rounded-2xl border border-white/10 bg-gradient-to-b from-neutral-900/60 to-neutral-950/80 p-4 sm:p-8 md:p-12 backdrop-blur-xl overflow-hidden shadow-2xl"
+          onPointerCancel={handlePointerCancel}
+          style={{ touchAction: 'pan-y' }}
+          className="relative min-h-[38rem] sm:min-h-[36rem] md:min-h-[36rem] rounded-2xl border border-white/10 bg-gradient-to-b from-neutral-900/60 to-neutral-950/80 p-4 sm:p-8 md:p-12 backdrop-blur-xl overflow-hidden shadow-2xl select-none"
         >
           {/* Texto del Manifiesto Editorial con Reflow Pretext */}
           <div
@@ -575,9 +685,15 @@ export const PretextCurlingSection: React.FC<PretextCurlingSectionProps> = ({
             return (
               <div
                 key={node.id}
+                ref={(el) => {
+                  nodeDomRefs.current[node.id] = el;
+                }}
                 onPointerDown={(e) => handlePointerDown(node.id, e)}
-                onMouseEnter={() => setHoveredNodeId(node.id)}
-                onMouseLeave={() => setHoveredNodeId(null)}
+                onPointerMove={handlePointerMove}
+                onPointerUp={handlePointerUp}
+                onPointerCancel={handlePointerCancel}
+                onMouseEnter={() => handleHoverChange(node.id)}
+                onMouseLeave={() => handleHoverChange(null)}
                 onClick={() => handleNodeClick(project)}
                 onDoubleClick={() => {
                   if (project) onSelectProject(project);
@@ -587,11 +703,9 @@ export const PretextCurlingSection: React.FC<PretextCurlingSectionProps> = ({
                   transform: `translate3d(${node.x - node.radius}px, ${node.y - node.radius}px, 0)`,
                   width: `${node.radius * 2}px`,
                   height: `${node.radius * 2}px`,
-                  transition: isResetting
-                    ? 'transform 0.6s cubic-bezier(0.25, 1, 0.5, 1)'
-                    : 'box-shadow 0.2s ease',
+                  transition: 'box-shadow 0.2s ease',
                 }}
-                className={`group absolute top-0 left-0 rounded-full cursor-grab active:cursor-grabbing z-20 select-none shadow-2xl transition-transform ${
+                className={`group absolute top-0 left-0 rounded-full cursor-grab active:cursor-grabbing z-20 select-none shadow-2xl ${
                   isHovered ? 'scale-105 z-30' : ''
                 }`}
               >

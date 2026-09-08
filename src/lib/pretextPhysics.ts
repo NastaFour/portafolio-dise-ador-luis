@@ -25,6 +25,7 @@ export interface PhysicsNode {
   isDragging: boolean;
   targetX?: number;
   targetY?: number;
+  isResetting?: boolean;
 }
 
 /**
