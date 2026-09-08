@@ -265,14 +265,14 @@ export const PHILOSOPHY_MANIFESTO = {
   es: {
     badge: 'Manifiesto de Autor & Filosofía',
     title: 'El Orden, la Mitología y el Espacio',
-    paragraph1: 'Para mí, el diseño, la animación 2D y 3D, y la producción audiovisual son formas de ordenar el mundo visual. No se trata únicamente de estética o función superficial, sino de una expresión profunda del alma humana capaz de conectar el mito, la disciplina y la vida cotidiana. Como en el concepto nórdico Raun, cada proyecto es una prueba necesaria donde el error y la experimentación forjan la verdadera maestría.',
+    paragraph1: 'Para mí, el diseño gráfico, la animación y motion graphics en After Effects, y la producción audiovisual son formas de ordenar el mundo visual. No se trata únicamente de estética o función superficial, sino de una expresión profunda del alma humana capaz de conectar el mito, la disciplina y la vida cotidiana. Como en el concepto nórdico Raun, cada proyecto es una prueba necesaria donde el error y la experimentación forjan la verdadera maestría.',
     paragraph2: 'Creo en la sobriedad del principio japonés Shibui: una elegancia silenciosa que no necesita adornos artificiosos para impactar, donde cada línea, peso tipográfico y vacío existe con un propósito deliberado. La tecnología y las herramientas digitales no reemplazan la intención creadora; potencian la precisión y la armonía de la obra.',
     hint: 'Arrastra los nodos interactivos para ceñir el texto a su contorno. Clic para ver caso de estudio. Pulsa Esc para restablecer.'
   },
   en: {
     badge: 'Author Manifesto & Philosophy',
     title: 'Order, Mythology, and Intentional Space',
-    paragraph1: 'To me, graphic design, 2D and 3D animation, and audiovisual production are deliberate ways of structuring the visual universe. It is never just surface aesthetics or shallow utility; it is a profound human expression connecting myth, discipline, and daily experience. Echoing the Norse concept of Raun, every creative work is a crucible where trial and persistence forge true mastery.',
+    paragraph1: 'To me, graphic design, After Effects motion graphics, and audiovisual storytelling are deliberate ways of structuring the visual universe. It is never just surface aesthetics or shallow utility; it is a profound human expression connecting myth, discipline, and daily experience. Echoing the Norse concept of Raun, every creative work is a crucible where trial and persistence forge true mastery.',
     paragraph2: 'I believe in the quiet restraint of Shibui: an understated elegance that needs no superfluous adornment to command attention, where every contour, type weight, and void serves an uncompromising purpose. Digital innovation and tools do not substitute creative intent; they amplify its precision and resonance.',
     hint: 'Drag interactive nodes to reflow text tightly around their contours. Click to inspect case study. Press Escape to reset.'
   }

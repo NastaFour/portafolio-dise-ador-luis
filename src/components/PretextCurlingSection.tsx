@@ -94,8 +94,72 @@ export const PretextCurlingSection: React.FC<PretextCurlingSectionProps> = ({
     }
   }, [p1RemainingText, p2FullText]);
 
-  // Inicializar posiciones de nodos relativas al contenedor con soporte móvil
-  const initPositions = useCallback(() => {
+  // Cache de dimensiones geométricas para erradicar el layout thrashing (cero getBoundingClientRect en rAF)
+  const cachedLayoutRef = useRef<{
+    w: number;
+    h: number;
+    p1OffsetLeft: number;
+    p1OffsetTop: number;
+    p1Width: number;
+    p1Height: number;
+    p2OffsetLeft: number;
+    p2OffsetTop: number;
+    p2Width: number;
+    p2Height: number;
+    valid: boolean;
+  }>({
+    w: 0,
+    h: 0,
+    p1OffsetLeft: 0,
+    p1OffsetTop: 0,
+    p1Width: 0,
+    p1Height: 0,
+    p2OffsetLeft: 0,
+    p2OffsetTop: 0,
+    p2Width: 0,
+    p2Height: 0,
+    valid: false,
+  });
+
+  const lastReflowPositionsRef = useRef<Array<{ x: number; y: number }>>([]);
+  const [isVisible, setIsVisible] = useState(false);
+  const isVisibleRef = useRef(false);
+
+  const hasInitializedRef = useRef(false);
+  const lastContainerWidthRef = useRef(0);
+  const lastContainerHeightRef = useRef(0);
+  const lastWindowWidthRef = useRef<number>(typeof window !== 'undefined' ? window.innerWidth : 0);
+
+  const updateCachedLayout = useCallback(() => {
+    const container = containerRef.current;
+    if (!container) return;
+    const cRect = container.getBoundingClientRect();
+    if (cRect.width < 60 || cRect.height < 60) return;
+
+    const p1 = p1Ref.current;
+    const p2 = p2Ref.current;
+    const p1Rect = p1 ? p1.getBoundingClientRect() : null;
+    const p2Rect = p2 ? p2.getBoundingClientRect() : null;
+
+    cachedLayoutRef.current = {
+      w: cRect.width,
+      h: cRect.height,
+      p1OffsetLeft: p1Rect ? p1Rect.left - cRect.left : 0,
+      p1OffsetTop: p1Rect ? p1Rect.top - cRect.top : 0,
+      p1Width: p1Rect ? p1Rect.width : 0,
+      p1Height: p1Rect ? p1Rect.height : 0,
+      p2OffsetLeft: p2Rect ? p2Rect.left - cRect.left : 0,
+      p2OffsetTop: p2Rect ? p2Rect.top - cRect.top : 0,
+      p2Width: p2Rect ? p2Rect.width : 0,
+      p2Height: p2Rect ? p2Rect.height : 0,
+      valid: true,
+    };
+  }, []);
+
+  // Inicializar o adaptar posiciones de nodos relativas al contenedor.
+  // En un redimensionamiento real (giro de móvil o resize de ventana), escala proporcionalmente
+  // en lugar de reiniciar bruscamente a las posiciones de reposo originales.
+  const initOrUpdatePositions = useCallback((isResize = false) => {
     if (!containerRef.current) return;
     const rect = containerRef.current.getBoundingClientRect();
     const w = rect.width;
@@ -103,10 +167,111 @@ export const PretextCurlingSection: React.FC<PretextCurlingSectionProps> = ({
 
     if (w < 60 || h < 60) return;
 
+    const prevW = lastContainerWidthRef.current || w;
+    const prevH = lastContainerHeightRef.current || h;
+    lastContainerWidthRef.current = w;
+    lastContainerHeightRef.current = h;
+
     const isSmall = w < 640;
     // Escalar el radio de los nodos para que en móvil encajen con elegancia y proporción
     const radiusScale = isSmall ? Math.max(0.62, Math.min(0.85, w / 480)) : 1;
 
+    // Si ya fueron inicializados y esto es un resize real (ancho cambió):
+    // Preservar la posición actual de los nodos escalándolos proporcionalmente, sin tirones bruscos.
+    if (hasInitializedRef.current && isResize) {
+      const scaleX = prevW > 0 ? w / prevW : 1;
+      const scaleY = prevH > 0 ? h / prevH : 1;
+
+      const updatedNodes: PhysicsNode[] = nodesRef.current.map((node) => {
+        const config = DISCIPLINE_NODES.find((d) => d.id === node.id);
+        const scaledRadius = config ? Math.round(config.radius * radiusScale) : node.radius;
+
+        let initXPercent = config ? config.initialX : 50;
+        let initYPercent = config ? config.initialY : 50;
+
+        if (isSmall && config) {
+          switch (config.id) {
+            case 'node-profile':
+              initXPercent = 80;
+              initYPercent = 14;
+              break;
+            case 'node-raun':
+              initXPercent = 20;
+              initYPercent = 34;
+              break;
+            case 'node-dolores':
+              initXPercent = 80;
+              initYPercent = 52;
+              break;
+            case 'node-ironwall':
+              initXPercent = 20;
+              initYPercent = 70;
+              break;
+            case 'node-legion':
+              initXPercent = 80;
+              initYPercent = 88;
+              break;
+          }
+        }
+
+        const newRestX = Math.max(
+          scaledRadius + 6,
+          Math.min(w - scaledRadius - 6, (initXPercent / 100) * w)
+        );
+        const newRestY = Math.max(
+          scaledRadius + 6,
+          Math.min(h - scaledRadius - 6, (initYPercent / 100) * h)
+        );
+
+        // Si el usuario está arrastrando este nodo, no interrumpir
+        if (node.isDragging) {
+          return {
+            ...node,
+            radius: scaledRadius,
+            restX: newRestX,
+            restY: newRestY,
+          };
+        }
+
+        // Si el nodo está flotando, escalar su posición actual al nuevo tamaño de pantalla
+        const newX = Math.max(
+          scaledRadius + 6,
+          Math.min(w - scaledRadius - 6, node.x * scaleX)
+        );
+        const newY = Math.max(
+          scaledRadius + 6,
+          Math.min(h - scaledRadius - 6, node.y * scaleY)
+        );
+
+        return {
+          ...node,
+          radius: scaledRadius,
+          x: newX,
+          y: newY,
+          restX: newRestX,
+          restY: newRestY,
+          targetX: newX,
+          targetY: newY,
+        };
+      });
+
+      nodesRef.current = updatedNodes;
+      setNodes(updatedNodes);
+
+      for (let i = 0; i < updatedNodes.length; i++) {
+        const n = updatedNodes[i];
+        const el = nodeDomRefs.current[n.id];
+        if (el) {
+          el.style.transform = `translate3d(${(n.x - n.radius).toFixed(2)}px, ${(n.y - n.radius).toFixed(2)}px, 0)`;
+        }
+      }
+
+      updateCachedLayout();
+      return;
+    }
+
+    // Primera inicialización al montar el componente
+    hasInitializedRef.current = true;
     const updatedNodes: PhysicsNode[] = nodesRef.current.map((node) => {
       const config = DISCIPLINE_NODES.find((d) => d.id === node.id);
       if (!config) return node;
@@ -175,40 +340,69 @@ export const PretextCurlingSection: React.FC<PretextCurlingSectionProps> = ({
       }
     }
 
-    setTimeout(setupPretextTargets, 60);
-  }, [setupPretextTargets]);
+    updateCachedLayout();
+    setTimeout(() => {
+      setupPretextTargets();
+      updateCachedLayout();
+    }, 60);
+  }, [setupPretextTargets, updateCachedLayout]);
 
   useEffect(() => {
-    initPositions();
+    initOrUpdatePositions(false);
+    lastWindowWidthRef.current = typeof window !== 'undefined' ? window.innerWidth : 0;
 
     const container = containerRef.current;
     let ro: ResizeObserver | null = null;
     if (container && typeof ResizeObserver !== 'undefined') {
       ro = new ResizeObserver((entries) => {
         for (const entry of entries) {
-          if (entry.contentRect.width > 60 && entry.contentRect.height > 60) {
-            initPositions();
+          const w = Math.round(entry.contentRect.width);
+          const h = Math.round(entry.contentRect.height);
+          if (w < 60 || h < 60) continue;
+
+          // Ignorar cambios exclusivos de altura (generados por reflow de texto o barra móvil).
+          // Solo adaptar posiciones si el ANCHO cambió significativamente (>= 6px).
+          if (Math.abs(w - lastContainerWidthRef.current) >= 6) {
+            initOrUpdatePositions(true);
+          } else if (Math.abs(h - lastContainerHeightRef.current) >= 6) {
+            // El texto se expandió o contrajo: solo actualizar dimensiones de colisión,
+            // NUNCA reiniciar ni teletransportar los nodos.
+            lastContainerHeightRef.current = h;
+            updateCachedLayout();
           }
         }
       });
       ro.observe(container);
     }
 
-    window.addEventListener('resize', initPositions);
+    const handleWindowResize = () => {
+      const winW = window.innerWidth;
+      // En móvil, hacer scroll oculta/muestra la barra de direcciones y dispara resize en window,
+      // pero window.innerWidth se mantiene idéntico. Filtramos esto para jamás reiniciar las físicas al hacer scroll.
+      if (Math.abs(winW - lastWindowWidthRef.current) < 6) {
+        return;
+      }
+      lastWindowWidthRef.current = winW;
+      initOrUpdatePositions(true);
+    };
+
+    window.addEventListener('resize', handleWindowResize);
     return () => {
       if (ro) ro.disconnect();
-      window.removeEventListener('resize', initPositions);
+      window.removeEventListener('resize', handleWindowResize);
     };
-  }, [initPositions]);
+  }, [initOrUpdatePositions, updateCachedLayout]);
 
   useEffect(() => {
     setupPretextTargets();
+    updateCachedLayout();
     if (document.fonts?.ready) {
       document.fonts.ready.then(() => {
         setupPretextTargets();
+        updateCachedLayout();
       });
     }
-  }, [lang, setupPretextTargets]);
+  }, [lang, setupPretextTargets, updateCachedLayout]);
 
   // Restablecer posiciones suavemente con física de retorno activa (nunca congela las físicas)
   const handleReset = useCallback(() => {
@@ -242,7 +436,32 @@ export const PretextCurlingSection: React.FC<PretextCurlingSectionProps> = ({
     return () => window.removeEventListener('keydown', handleKeyDown);
   }, [handleReset]);
 
-  // Función interna de Reflow Pretext para un párrafo
+  // Control de visibilidad en viewport para pausar 100% el loop de físicas al hacer scroll
+  useEffect(() => {
+    const el = containerRef.current;
+    if (!el || typeof IntersectionObserver === 'undefined') {
+      setIsVisible(true);
+      isVisibleRef.current = true;
+      return;
+    }
+
+    const observer = new IntersectionObserver(
+      ([entry]) => {
+        const visible = entry.isIntersecting;
+        isVisibleRef.current = visible;
+        setIsVisible(visible);
+        if (visible) {
+          updateCachedLayout();
+        }
+      },
+      { rootMargin: '150px 0px 150px 0px', threshold: 0.05 }
+    );
+
+    observer.observe(el);
+    return () => observer.disconnect();
+  }, [updateCachedLayout]);
+
+  // Función interna de Reflow Pretext ultra-optimizada (cero getBoundingClientRect ni getComputedStyle en el loop)
   const executeParagraphReflow = useCallback(
     (
       pEl: HTMLElement | null,
@@ -251,16 +470,14 @@ export const PretextCurlingSection: React.FC<PretextCurlingSectionProps> = ({
       target: PretextFlowTarget | null,
       pool: HTMLSpanElement[],
       activeNodes: PhysicsNode[],
-      containerRect: DOMRect,
+      offsetLeft: number,
+      offsetTop: number,
+      pWidth: number,
+      pHeight: number,
+      containerWidth: number,
       hasDropcap: boolean
     ) => {
-      if (!pEl || !overlayEl || !baseTextEl || !target) return;
-
-      const pRect = pEl.getBoundingClientRect();
-      const offsetLeft = pRect.left - containerRect.left;
-      const offsetTop = pRect.top - containerRect.top;
-      const pWidth = pRect.width;
-      const pHeight = pRect.height;
+      if (!pEl || !overlayEl || !baseTextEl || !target || pWidth < 50) return;
 
       // Filtrar nodos que intersectan o están adyacentes al párrafo
       const obstacles: { x: number; y: number; radius: number }[] = [];
@@ -282,7 +499,7 @@ export const PretextCurlingSection: React.FC<PretextCurlingSectionProps> = ({
       }
 
       if (obstacles.length > 0) {
-        const isSmall = containerRect.width < 640;
+        const isSmall = containerWidth < 640;
         const hPad = isSmall ? 6 : 8;
         const vPad = isSmall ? 2 : 3;
         const dropcapW = isSmall ? 40 : 56;
@@ -294,8 +511,7 @@ export const PretextCurlingSection: React.FC<PretextCurlingSectionProps> = ({
           overlayEl.style.display = 'block';
           baseTextEl.style.opacity = '0';
 
-          const s = window.getComputedStyle(pEl);
-          const color = target.color || s.color;
+          const color = target.color;
           const font = target.font;
           const lineH = `${target.lineH}px`;
 
@@ -331,7 +547,10 @@ export const PretextCurlingSection: React.FC<PretextCurlingSectionProps> = ({
           // Adaptar altura mínima si el texto reflowed necesita más líneas
           const totalReflowHeight = lines[lines.length - 1].y + target.lineH;
           if (totalReflowHeight > pHeight) {
-            pEl.style.minHeight = `${Math.ceil(totalReflowHeight)}px`;
+            const nextMin = `${Math.ceil(totalReflowHeight)}px`;
+            if (pEl.style.minHeight !== nextMin) {
+              pEl.style.minHeight = nextMin;
+            }
           }
           return;
         }
@@ -341,7 +560,9 @@ export const PretextCurlingSection: React.FC<PretextCurlingSectionProps> = ({
       if (overlayEl.style.display !== 'none') {
         overlayEl.style.display = 'none';
         baseTextEl.style.opacity = '1';
-        pEl.style.minHeight = '';
+        if (pEl.style.minHeight !== '') {
+          pEl.style.minHeight = '';
+        }
         for (let i = 0; i < pool.length; i++) {
           pool[i].style.display = 'none';
         }
@@ -351,17 +572,18 @@ export const PretextCurlingSection: React.FC<PretextCurlingSectionProps> = ({
   );
 
   // Bucle de física a 60 FPS con colisiones circulares, retorno elástico y Pretext Line-Carving
+  // Ultra-optimizado: solo se ejecuta cuando está visible y dirty-checking para evitar recalcular texto estático
   useEffect(() => {
+    if (!isVisible) return;
     let animId: number;
 
     const updatePhysics = () => {
+      if (!isVisibleRef.current) return;
       animId = requestAnimationFrame(updatePhysics);
 
-      const container = containerRef.current;
-      if (!container) return;
-      const containerRect = container.getBoundingClientRect();
-      const w = containerRect.width;
-      const h = containerRect.height;
+      const layout = cachedLayoutRef.current;
+      const w = layout.w;
+      const h = layout.h;
       if (w < 60 || h < 60) return;
 
       const currentNodes = nodesRef.current;
@@ -450,33 +672,65 @@ export const PretextCurlingSection: React.FC<PretextCurlingSectionProps> = ({
         }
       }
 
-      // Pretext reflow horizontal ceñido al contorno
-      executeParagraphReflow(
-        p1Ref.current,
-        p1OverlayRef.current,
-        p1BaseRef.current,
-        p1TargetRef.current,
-        p1PoolRef.current,
-        currentNodes,
-        containerRect,
-        true // hasDropcap
-      );
+      // Dirty checking para reflow tipográfico: solo reflow cuando los nodos se hayan desplazado perceptiblemente
+      let shouldReflow = false;
+      const lastPositions = lastReflowPositionsRef.current;
+      if (lastPositions.length !== currentNodes.length) {
+        shouldReflow = true;
+      } else {
+        for (let i = 0; i < currentNodes.length; i++) {
+          const n = currentNodes[i];
+          if (n.isDragging || n.isResetting) {
+            shouldReflow = true;
+            break;
+          }
+          const prev = lastPositions[i];
+          if (Math.abs(n.x - prev.x) > 0.6 || Math.abs(n.y - prev.y) > 0.6) {
+            shouldReflow = true;
+            break;
+          }
+        }
+      }
 
-      executeParagraphReflow(
-        p2Ref.current,
-        p2OverlayRef.current,
-        p2BaseRef.current,
-        p2TargetRef.current,
-        p2PoolRef.current,
-        currentNodes,
-        containerRect,
-        false // hasDropcap = false
-      );
+      if (shouldReflow && layout.valid) {
+        lastReflowPositionsRef.current = currentNodes.map((n) => ({ x: n.x, y: n.y }));
+
+        // Pretext reflow horizontal ceñido al contorno con dimensiones cacheadas
+        executeParagraphReflow(
+          p1Ref.current,
+          p1OverlayRef.current,
+          p1BaseRef.current,
+          p1TargetRef.current,
+          p1PoolRef.current,
+          currentNodes,
+          layout.p1OffsetLeft,
+          layout.p1OffsetTop,
+          layout.p1Width,
+          layout.p1Height,
+          layout.w,
+          true // hasDropcap
+        );
+
+        executeParagraphReflow(
+          p2Ref.current,
+          p2OverlayRef.current,
+          p2BaseRef.current,
+          p2TargetRef.current,
+          p2PoolRef.current,
+          currentNodes,
+          layout.p2OffsetLeft,
+          layout.p2OffsetTop,
+          layout.p2Width,
+          layout.p2Height,
+          layout.w,
+          false // hasDropcap = false
+        );
+      }
     };
 
     animId = requestAnimationFrame(updatePhysics);
     return () => cancelAnimationFrame(animId);
-  }, [executeParagraphReflow]);
+  }, [isVisible, executeParagraphReflow]);
 
   // Inicio de Arrastre con Pointer Events (Touch móvil y Ratón unificados)
   const handlePointerDown = (id: string, e: React.PointerEvent) => {

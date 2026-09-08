@@ -1,6 +1,5 @@
 import React from 'react';
 import { ArrowUpRight } from 'lucide-react';
-import { JapaneseKanjiAmbientBackground } from './JapaneseKanjiAmbientBackground';
 
 interface ContactSectionProps {
   lang: 'es' | 'en';
@@ -9,9 +8,6 @@ interface ContactSectionProps {
 export const ContactSection: React.FC<ContactSectionProps> = ({ lang }) => {
   return (
     <footer id="contacto" className="relative py-24 px-4 sm:px-6 lg:px-8 bg-[#0d0d0d] text-[#E8E4DC] border-t border-white/10 overflow-hidden">
-      {/* Fondo de Animación 2D/3D con Caracteres Japoneses (Shibui, Ma, Wabi-Sabi) y Círculo Enso */}
-      <JapaneseKanjiAmbientBackground />
-
       <div className="max-w-6xl mx-auto relative z-10">
         {/* Marca de agua monumental de fondo (estilo letra 'R' de la imagen 3 de referencia) */}
         <div className="absolute -top-16 -right-12 text-[14rem] sm:text-[20rem] font-display font-extrabold text-white/[0.02] select-none pointer-events-none leading-none z-0">
@@ -49,11 +45,11 @@ export const ContactSection: React.FC<ContactSectionProps> = ({ lang }) => {
                   <span className="text-[#C84B31] font-bold select-none text-base leading-none mt-0.5">-</span>
                   <span>
                     <strong className="text-white font-medium">
-                      {lang === 'es' ? 'Animación 2D y 3D:' : '2D & 3D Animation:'}
+                      {lang === 'es' ? 'After Effects & Motion Design:' : 'After Effects & Motion Design:'}
                     </strong>{' '}
                     {lang === 'es'
-                      ? 'Motion graphics cinematográficos, intros cinemáticas y loops volumétricos.'
-                      : 'Cinematic motion design, narrative title sequences, and volumetric loops.'}
+                      ? 'Motion graphics publicitarios, kinetic typography e intros cinemáticas (producciones para Kriss Ecuador, Minerva y más).'
+                      : 'Commercial motion graphics, kinetic typography, and cinematic intros (productions for Kriss Ecuador, Minerva, and beyond).'}
                   </span>
                 </li>
                 <li className="flex items-start gap-3">

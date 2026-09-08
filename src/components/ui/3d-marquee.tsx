@@ -48,81 +48,58 @@ export const ThreeDMarquee: React.FC<ThreeDMarqueeProps> = ({
     return () => observer.disconnect()
   }, [])
 
-  // Dividir en 3 columnas equilibradas (3 imágenes por columna)
-  const chunkSize = Math.ceil(images.length / 3)
-  const chunks = Array.from({ length: 3 }, (_, colIndex) => {
-    const start = colIndex * chunkSize
-    return images.slice(start, start + chunkSize)
-  })
+  // Duplicar array para loop infinito continuo
+  const duplicatedImages = [...images, ...images];
 
   return (
     <div
       ref={containerRef}
       className={cn(
-        'mx-auto block h-[38rem] w-full overflow-hidden rounded-xl bg-neutral-950/60 border border-white/5 py-8 max-xl:h-[32rem] max-sm:h-[26rem]',
+        'relative w-full overflow-hidden rounded-2xl bg-neutral-950/60 border border-white/10 py-6 sm:py-8 backdrop-blur-sm select-none group',
         className
       )}
     >
-      <div className="flex size-full items-center justify-center">
-        <div className="aspect-square size-[45rem] shrink-0 scale-125 max-xl:size-full max-xl:scale-105 max-sm:scale-120">
-          <div
-            style={{
-              transform: 'rotateX(45deg) rotateY(0deg) rotateZ(45deg)',
-              transformStyle: 'preserve-3d',
-            }}
-            className="relative top-0 right-[-50%] grid size-full origin-top-left grid-cols-3 gap-5 max-xl:-top-24 max-xl:right-[-40%] max-sm:top-0 max-sm:gap-2"
-          >
-            {chunks.map((subarray, colIndex) => {
-              const isEven = colIndex % 2 === 0
-              const animDuration = isEven ? '14s' : '18s'
+      {/* Máscaras de gradiente lateral para desvanecimiento suave */}
+      <div className="absolute inset-y-0 left-0 w-16 sm:w-28 bg-gradient-to-r from-[#111111] to-transparent z-10 pointer-events-none" />
+      <div className="absolute inset-y-0 right-0 w-16 sm:w-28 bg-gradient-to-l from-[#111111] to-transparent z-10 pointer-events-none" />
 
-              return (
-                <div
-                  key={`col-${colIndex}`}
-                  style={{
-                    animation: isVisible
-                      ? `marqueeFloat ${animDuration} ease-in-out infinite alternate`
-                      : 'none',
-                    animationDirection: isEven ? 'normal' : 'reverse',
-                    willChange: isVisible ? 'transform' : 'auto',
-                  }}
-                  className="flex flex-col items-start gap-6 max-sm:gap-3"
-                >
-                  {subarray.map((src, imageIndex) => (
-                    <div
-                      key={`img-${colIndex}-${imageIndex}-${src}`}
-                      className="relative overflow-hidden rounded-xl border border-white/15 bg-neutral-900 shadow-lg transition-transform duration-300 hover:scale-105 hover:border-editorial-accent/80"
-                    >
-                      <img
-                        className="aspect-[4/3] h-full w-full object-cover select-none bg-neutral-900"
-                        src={src}
-                        draggable={false}
-                        alt={`Proyecto ${imageIndex + 1}`}
-                        loading="lazy"
-                        decoding="async"
-                      />
-                    </div>
-                  ))}
-                </div>
-              )
-            })}
+      {/* Riel 2D Horizontal Continuo */}
+      <div
+        style={{
+          animation: isVisible ? 'marquee2D 35s linear infinite' : 'none',
+          willChange: isVisible ? 'transform' : 'auto',
+        }}
+        className="flex gap-4 sm:gap-6 w-max group-hover:[animation-play-state:paused]"
+      >
+        {duplicatedImages.map((src, idx) => (
+          <div
+            key={`marquee-img-${idx}`}
+            className="relative shrink-0 w-64 sm:w-80 md:w-96 aspect-[16/10] rounded-xl overflow-hidden border border-white/10 bg-neutral-900 shadow-xl transition-all duration-300 hover:border-[#C84B31]/80 hover:scale-[1.02]"
+          >
+            <img
+              src={src}
+              alt={`Lámina ${idx + 1}`}
+              className="w-full h-full object-cover select-none"
+              loading="lazy"
+              draggable={false}
+            />
+            <div className="absolute inset-0 bg-gradient-to-t from-black/60 via-transparent to-transparent pointer-events-none" />
           </div>
-        </div>
+        ))}
       </div>
 
-      {/* CSS Keyframes nativos de GPU para animación sedosa sin JavaScript */}
       <style>{`
-        @keyframes marqueeFloat {
+        @keyframes marquee2D {
           0% {
-            transform: translate3d(0, -40px, 0);
+            transform: translateX(0%);
           }
           100% {
-            transform: translate3d(0, 40px, 0);
+            transform: translateX(-50%);
           }
         }
       `}</style>
     </div>
-  )
-}
+  );
+};
 
-export default ThreeDMarquee
+export default ThreeDMarquee;

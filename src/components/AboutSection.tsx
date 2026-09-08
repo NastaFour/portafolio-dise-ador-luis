@@ -1,5 +1,5 @@
 import React from 'react';
-import { CreativeDisciplinesAtelier } from './CreativeDisciplinesAtelier';
+import { JapaneseEmakimonoScroll } from './JapaneseEmakimonoScroll';
 
 interface AboutSectionProps {
   lang: 'es' | 'en';
@@ -26,8 +26,8 @@ export const AboutSection: React.FC<AboutSectionProps> = ({ lang }) => {
             </h2>
             <p className="text-base sm:text-xl text-neutral-400 font-display italic mt-2">
               {lang === 'es'
-                ? 'Diseñador Gráfico, Animador 2D/3D & Productor Audiovisual graduado del ISTER.'
-                : 'Graphic Designer, 2D/3D Animator & Audiovisual Producer from ISTER.'}
+                ? 'Diseñador Gráfico, Especialista en After Effects & Productor Audiovisual graduado del ISTER. Animación y diseño para Kriss Ecuador y Minerva.'
+                : 'Graphic Designer, After Effects Specialist & Audiovisual Producer from ISTER. Motion design and branding for Kriss Ecuador and Minerva.'}
             </p>
           </div>
 
@@ -56,9 +56,29 @@ export const AboutSection: React.FC<AboutSectionProps> = ({ lang }) => {
                     <strong className="text-white font-medium">
                       {lang === 'es' ? 'Experiencia de Campo:' : 'Industry Experience:'}
                     </strong>{' '}
-                    {lang === 'es'
-                      ? 'Producción en CreativeIn y campañas para Banco Pichincha y BGR.'
-                      : 'Production at CreativeIn and campaigns for Banco Pichincha and BGR.'}
+                    {lang === 'es' ? (
+                      <>
+                        Producción en CreativeIn y desarrollo visual y animación para marcas como{' '}
+                        <strong className="text-white font-semibold underline decoration-[#C84B31] underline-offset-4">
+                          Kriss Ecuador
+                        </strong>{' '}
+                        y{' '}
+                        <strong className="text-white font-semibold underline decoration-[#C84B31] underline-offset-4">
+                          Minerva
+                        </strong>.
+                      </>
+                    ) : (
+                      <>
+                        Production at CreativeIn, motion design and visual development for brands including{' '}
+                        <strong className="text-white font-semibold underline decoration-[#C84B31] underline-offset-4">
+                          Kriss Ecuador
+                        </strong>{' '}
+                        and{' '}
+                        <strong className="text-white font-semibold underline decoration-[#C84B31] underline-offset-4">
+                          Minerva
+                        </strong>.
+                      </>
+                    )}
                   </span>
                 </li>
                 <li className="flex items-start gap-3">
@@ -68,8 +88,8 @@ export const AboutSection: React.FC<AboutSectionProps> = ({ lang }) => {
                       {lang === 'es' ? 'Especialidades Técnicas:' : 'Core Specialties:'}
                     </strong>{' '}
                     {lang === 'es'
-                      ? 'Animación 2D/3D, motion graphics cinemático, dirección de arte y editorial.'
-                      : '2D/3D animation, cinematic motion graphics, art direction & editorial design.'}
+                      ? 'Diseño gráfico y editorial, After Effects, motion graphics, dirección de arte y producción audiovisual.'
+                      : 'Graphic & editorial design, After Effects motion graphics, art direction & audiovisual production.'}
                   </span>
                 </li>
                 <li className="flex items-start gap-3">
@@ -90,8 +110,8 @@ export const AboutSection: React.FC<AboutSectionProps> = ({ lang }) => {
                       {lang === 'es' ? 'Pipeline Digital:' : 'Digital Pipeline:'}
                     </strong>{' '}
                     {lang === 'es'
-                      ? 'Flujo integral de creación en Cinema 4D, Spline 3D, zBrush, After Effects e InDesign.'
-                      : 'Full creative pipeline across Cinema 4D, Spline 3D, zBrush, After Effects & InDesign.'}
+                      ? 'Flujo integral de creación en After Effects, InDesign, Illustrator, Photoshop y Premiere Pro.'
+                      : 'Full creative pipeline across After Effects, InDesign, Illustrator, Photoshop & Premiere Pro.'}
                   </span>
                 </li>
               </ul>
@@ -145,11 +165,11 @@ export const AboutSection: React.FC<AboutSectionProps> = ({ lang }) => {
                 </span>
                 <div className="grid grid-cols-1 sm:grid-cols-2 gap-2 text-xs font-mono">
                   <div className="p-2.5 rounded bg-white/[0.02] border border-white/5 flex items-center justify-between">
-                    <span className="text-neutral-400">01 // 3D & MOTION</span>
-                    <span className="text-white">C4D · Spline · zBrush · AE · PR</span>
+                    <span className="text-neutral-400">01 // AFTER EFFECTS & MOTION</span>
+                    <span className="text-white">After Effects · Premiere Pro · Audition</span>
                   </div>
                   <div className="p-2.5 rounded bg-white/[0.02] border border-white/5 flex items-center justify-between">
-                    <span className="text-neutral-400">02 // EDITORIAL & BRAND</span>
+                    <span className="text-neutral-400">02 // DISEÑO EDITORIAL & MARCA</span>
                     <span className="text-white">InDesign · Illustrator · Photoshop</span>
                   </div>
                 </div>
@@ -158,9 +178,9 @@ export const AboutSection: React.FC<AboutSectionProps> = ({ lang }) => {
           </div>
         </div>
 
-        {/* Atelier de Creación & Disciplinas (Animación 2D, 3D, Editorial Shibui, Branding) */}
+        {/* Rollo Emakimono Japonés Horizontal (Reemplaza las secciones anteriores por un pergamino narrativo continuo) */}
         <div className="pt-12 border-t border-white/10">
-          <CreativeDisciplinesAtelier lang={lang} />
+          <JapaneseEmakimonoScroll lang={lang} />
         </div>
       </div>
     </section>

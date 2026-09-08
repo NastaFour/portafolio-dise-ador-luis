@@ -127,6 +127,7 @@ export const ProjectShowcase: React.FC<ProjectShowcaseProps> = ({
                     alt={project.title}
                     className="relative z-10 max-h-[250px] sm:max-h-[400px] w-auto max-w-full object-contain rounded-xl shadow-2xl transition duration-500 group-hover/card:scale-[1.03] select-none"
                     loading="lazy"
+                    decoding="async"
                   />
 
                   {/* Overlay interactivo en hover */}

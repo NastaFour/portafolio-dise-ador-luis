@@ -148,6 +148,8 @@ export const ProjectDetailModal: React.FC<ProjectDetailModalProps> = ({
                       src={img}
                       alt={`${project.title} detalle ${idx + 1}`}
                       className="max-h-[340px] w-auto max-w-full object-contain rounded transition duration-300 group-hover:scale-105"
+                      loading="lazy"
+                      decoding="async"
                     />
                     <div className="absolute bottom-3 right-3 p-2 rounded-full bg-black/75 border border-white/20 text-white backdrop-blur-md opacity-0 group-hover:opacity-100 transition pointer-events-none">
                       <Maximize2 className="w-3.5 h-3.5 text-[#C84B31]" />

@@ -21,7 +21,7 @@ export function App() {
       {/* Navegación Flotante con Selector de Idioma */}
       <HeaderNav lang={lang} onToggleLang={toggleLang} />
 
-      {/* Hero 3D con Spline Interactivo */}
+      {/* Hero Editorial 2D de Autor */}
       <main>
         <HeroSection lang={lang} />
 
@@ -31,7 +31,7 @@ export function App() {
           onSelectProject={(project) => setSelectedProject(project)}
         />
 
-        {/* Vitrina 3D Marquee y Casos de Estudio Estilo NexStudio */}
+        {/* Vitrina Editorial 2D y Casos de Estudio Estilo NexStudio */}
         <ProjectShowcase
           lang={lang}
           onSelectProject={(project) => setSelectedProject(project)}

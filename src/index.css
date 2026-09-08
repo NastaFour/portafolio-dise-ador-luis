@@ -108,10 +108,6 @@
   }
 }
 
-.spline-container canvas {
-  touch-action: pan-y !important;
-}
-
 /* Custom editorial styles */
 .font-display {
   font-family: var(--font-display);
@@ -119,30 +115,6 @@
 
 .font-sans {
   font-family: var(--font-sans);
-}
-
-/* Zero lag transform accelerations */
-.transform-3d {
-  transform-style: preserve-3d;
-}
-
-/* Ocultar marca de agua Built with Spline en DOM y Shadow DOM */
-a[href*="spline.design"],
-#spline-watermark,
-[class*="spline-watermark"],
-.spline-watermark,
-canvas + a,
-.spline-container a,
-#logo,
-[class*="watermark"],
-[aria-label*="Spline"],
-[id*="watermark"] {
-  display: none !important;
-  opacity: 0 !important;
-  pointer-events: none !important;
-  visibility: hidden !important;
-  width: 0 !important;
-  height: 0 !important;
 }
 
 @media (prefers-reduced-motion: reduce) {
