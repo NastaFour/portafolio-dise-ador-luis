@@ -1,5 +1,6 @@
 import React from 'react';
 import { ArrowUpRight } from 'lucide-react';
+import { JapaneseKanjiAmbientBackground } from './JapaneseKanjiAmbientBackground';
 
 interface ContactSectionProps {
   lang: 'es' | 'en';
@@ -8,7 +9,10 @@ interface ContactSectionProps {
 export const ContactSection: React.FC<ContactSectionProps> = ({ lang }) => {
   return (
     <footer id="contacto" className="relative py-24 px-4 sm:px-6 lg:px-8 bg-[#0d0d0d] text-[#E8E4DC] border-t border-white/10 overflow-hidden">
-      <div className="max-w-6xl mx-auto relative">
+      {/* Fondo de Animación 2D/3D con Caracteres Japoneses (Shibui, Ma, Wabi-Sabi) y Círculo Enso */}
+      <JapaneseKanjiAmbientBackground />
+
+      <div className="max-w-6xl mx-auto relative z-10">
         {/* Marca de agua monumental de fondo (estilo letra 'R' de la imagen 3 de referencia) */}
         <div className="absolute -top-16 -right-12 text-[14rem] sm:text-[20rem] font-display font-extrabold text-white/[0.02] select-none pointer-events-none leading-none z-0">
           C
