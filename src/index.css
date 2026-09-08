@@ -1,0 +1,155 @@
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+@font-face {
+  font-family: 'CrossfitDemo';
+  src: url('/fonts/CrossfitDemo-Light.otf') format('opentype');
+  font-weight: 300;
+  font-style: normal;
+  font-display: swap;
+}
+
+@font-face {
+  font-family: 'CrossfitDemo';
+  src: url('/fonts/CrossfitDemo-Demi.otf') format('opentype');
+  font-weight: 600;
+  font-style: normal;
+  font-display: swap;
+}
+
+@font-face {
+  font-family: 'CrossfitDemo';
+  src: url('/fonts/CrossfitDemo-Heavy.otf') format('opentype');
+  font-weight: 900;
+  font-style: normal;
+  font-display: swap;
+}
+
+@layer base {
+  :root {
+    --background: 40 25% 94%;
+    --foreground: 0 0% 7%;
+
+    --card: 40 25% 94%;
+    --card-foreground: 0 0% 7%;
+
+    --popover: 40 25% 94%;
+    --popover-foreground: 0 0% 7%;
+
+    --primary: 10 61% 49%;
+    --primary-foreground: 0 0% 98%;
+
+    --secondary: 40 10% 88%;
+    --secondary-foreground: 0 0% 9%;
+
+    --muted: 40 10% 88%;
+    --muted-foreground: 0 0% 45%;
+
+    --accent: 10 61% 49%;
+    --accent-foreground: 0 0% 98%;
+
+    --destructive: 0 84.2% 60.2%;
+    --destructive-foreground: 0 0% 98%;
+
+    --border: 40 10% 82%;
+    --input: 40 10% 82%;
+    --ring: 10 61% 49%;
+
+    --radius: 0.75rem;
+
+    --font-display: 'Cormorant Garamond', Georgia, serif;
+    --font-sans: 'Geist', 'Inter', system-ui, sans-serif;
+  }
+
+  .dark {
+    --background: 0 0% 8%;
+    --foreground: 40 15% 90%;
+
+    --card: 0 0% 8%;
+    --card-foreground: 40 15% 90%;
+
+    --popover: 0 0% 8%;
+    --popover-foreground: 40 15% 90%;
+
+    --primary: 10 61% 49%;
+    --primary-foreground: 0 0% 98%;
+
+    --secondary: 0 0% 15%;
+    --secondary-foreground: 40 15% 90%;
+
+    --muted: 0 0% 15%;
+    --muted-foreground: 0 0% 60%;
+
+    --accent: 10 61% 49%;
+    --accent-foreground: 0 0% 98%;
+
+    --destructive: 0 62.8% 30.6%;
+    --destructive-foreground: 0 0% 98%;
+
+    --border: 0 0% 20%;
+    --input: 0 0% 20%;
+    --ring: 10 61% 49%;
+  }
+}
+
+@layer base {
+  * {
+    @apply border-border;
+  }
+  html, body {
+    overflow-x: hidden;
+    max-width: 100vw;
+    -webkit-overflow-scrolling: touch;
+  }
+  body {
+    @apply bg-background text-foreground;
+    font-feature-settings: "rlig" 1, "calt" 1;
+  }
+}
+
+.spline-container canvas {
+  touch-action: pan-y !important;
+}
+
+/* Custom editorial styles */
+.font-display {
+  font-family: var(--font-display);
+}
+
+.font-sans {
+  font-family: var(--font-sans);
+}
+
+/* Zero lag transform accelerations */
+.transform-3d {
+  transform-style: preserve-3d;
+}
+
+/* Ocultar marca de agua Built with Spline en DOM y Shadow DOM */
+a[href*="spline.design"],
+#spline-watermark,
+[class*="spline-watermark"],
+.spline-watermark,
+canvas + a,
+.spline-container a,
+#logo,
+[class*="watermark"],
+[aria-label*="Spline"],
+[id*="watermark"] {
+  display: none !important;
+  opacity: 0 !important;
+  pointer-events: none !important;
+  visibility: hidden !important;
+  width: 0 !important;
+  height: 0 !important;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  * {
+    animation-duration: 0.01ms !important;
+    animation-iteration-count: 1 !important;
+    transition-duration: 0.01ms !important;
+    scroll-behavior: auto !important;
+  }
+}

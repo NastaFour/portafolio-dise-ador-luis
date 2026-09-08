@@ -12,3 +12,16 @@ referencia del dise;ador/
 
 # Subagente
 subagente/
+
+# Entorno y dependencias
+node_modules/
+dist/
+.skills-install/
+.atl/
+*.tsbuildinfo
+
+# Archivos de trabajo temporal y respaldos pesados
+TODO/
+scratch/
+design-artifacts/
+index.old.html
