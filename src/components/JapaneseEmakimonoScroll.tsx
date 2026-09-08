@@ -143,7 +143,7 @@ const EMAKI_SECTIONS: ScrollSection[] = [
     },
     highlight: {
       label: { es: 'CONFIANZA & ALIANZAS', en: 'TRUSTED BY' },
-      value: 'Kriss Ecuador · Minerva · CreativeIn · ISTER',
+      value: 'Kriss Ecuador · Minerva · ISTER',
     },
     tools: ['Shibui (Elegancia)', 'Ma (Vacío)', 'Wabi-Sabi', 'Raun (Crisol)', 'Rigor Suizo'],
     icon: Compass,

@@ -58,7 +58,7 @@ export const AboutSection: React.FC<AboutSectionProps> = ({ lang }) => {
                     </strong>{' '}
                     {lang === 'es' ? (
                       <>
-                        Producción en CreativeIn y desarrollo visual y animación para marcas como{' '}
+                        Producción en desarrollo de post para redes sociales, desarrollo visual y animación para marcas como{' '}
                         <strong className="text-white font-semibold underline decoration-[#C84B31] underline-offset-4">
                           Kriss Ecuador
                         </strong>{' '}
@@ -69,7 +69,7 @@ export const AboutSection: React.FC<AboutSectionProps> = ({ lang }) => {
                       </>
                     ) : (
                       <>
-                        Production at CreativeIn, motion design and visual development for brands including{' '}
+                        Social media post production & development, motion design and visual development for brands including{' '}
                         <strong className="text-white font-semibold underline decoration-[#C84B31] underline-offset-4">
                           Kriss Ecuador
                         </strong>{' '}
