@@ -21,7 +21,7 @@ Branch: `feat/rediseno-objetos-autor` | Delivery: work-unit commits | Test runne
 ## Tasks
 
 - [x] **T0** | S1, S3 | route: inline | Extraer tokens y contenido de todos los PDFs (`portafolio_trabajo_luis.pdf`, `Luis_Bermudez_Hoja_de_vida.pdf`, `legionfit_editable_logo.pdf`, `tarjeta_de_presentacion.pdf`, `LIBRO DE TESIS`) en `design-artifacts/portafolio-luis/manual-y-referencias-pdf.md` y registrar `references/adrs/ADR-001-three-r3f-gsap-motion.md` | Evidence: commit `fcb9d24`
-- [ ] **T1** | S2 | route: inline | Optimizar imágenes pesadas de `public/` con `sharp` a WebP/AVIF manteniendo calidad visual en PC y móvil | Evidence: pending
+- [x] **T1** | S2 | route: inline | Optimizar imágenes pesadas de `public/` con `sharp` a WebP/AVIF manteniendo calidad visual en PC y móvil | Evidence: commit `7aacf70` (137.1 MB -> 8.6 MB)
 - [ ] **T2** | S1, S3 | route: inline | Limpiar todo el copy visible y metadatos de menciones al 3D, fijar Instagram a `https://www.instagram.com/krisecuador/`, blindar avales actuales (`Kriss Ecuador`, `Minerva`, `ISTER`) y añadir suite de tests en Vitest (RED/GREEN) | Evidence: pending
 - [ ] **T3** | S1, S2 | route: inline | Instalar `three`, `@types/three`, `@react-three/fiber`, `@react-three/drei`, `gsap`, `@gsap/react` (bajo ADR-001) y construir el sistema de animación 2D cinética y SVG motion graphics | Evidence: pending
 - [ ] **T4** | S1, S2 | route: inline | Reemplazar el Hero de Spline por escena de autor en React Three Fiber (Ensō escultórico terracota + pliegos editoriales orbitando) + tipografía cinética 2D optimizada para PC y móvil | Evidence: pending

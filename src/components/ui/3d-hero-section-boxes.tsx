@@ -268,8 +268,8 @@ function HeroContent({ lang = 'es' }: HeroContentProps) {
 
         <div className="text-[11px] sm:text-sm tracking-widest text-[#C84B31] font-semibold mt-3 sm:mt-4 uppercase">
           {lang === 'es'
-            ? 'Animación 2D & 3D / Motion Graphics / Dirección de Arte / Editorial'
-            : '2D & 3D Animation / Motion Graphics / Art Direction / Editorial'}
+            ? 'Motion Graphics / Dirección de Arte / Diseño Editorial / Producción Audiovisual'
+            : 'Motion Graphics / Art Direction / Editorial Design / Audiovisual Production'}
         </div>
       </div>
 
@@ -277,8 +277,8 @@ function HeroContent({ lang = 'es' }: HeroContentProps) {
       <div className="w-full lg:w-2/5 flex flex-col items-start lg:items-end lg:text-right">
         <p className="text-sm sm:text-lg text-neutral-300 opacity-90 mb-6 sm:mb-8 max-w-md font-sans leading-relaxed">
           {lang === 'es'
-            ? 'Creando animaciones 2D/3D, piezas tridimensionales y narrativas visuales desde el orden, la mitología y la estética contemporánea.'
-            : 'Crafting 2D/3D animations, volumetric forms, and visual narratives rooted in order, mythology, and contemporary aesthetics.'}
+            ? 'Creando piezas visuales, identidad y narrativas audiovisuales desde la claridad, el orden, la mitología y la intención en cada detalle.'
+            : 'Crafting visual pieces, identity systems, and audiovisual narratives rooted in clarity, order, mythology, and deliberate detail.'}
         </p>
 
         <div className="flex pointer-events-auto flex-col sm:flex-row items-stretch sm:items-center gap-2.5 sm:gap-3 w-full sm:w-auto">

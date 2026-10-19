@@ -162,21 +162,21 @@ export const ContactSection: React.FC<ContactSectionProps> = ({ lang }) => {
 
                   {/* Fila 03: Instagram */}
                   <a
-                    href="https://www.instagram.com/"
+                    href="https://www.instagram.com/krisecuador/"
                     target="_blank"
                     rel="noopener noreferrer"
                     className="py-4 px-3 flex flex-col sm:flex-row sm:items-center justify-between gap-2 hover:bg-white/[0.03] transition duration-200 group"
                   >
                     <div className="space-y-0.5">
                       <span className="text-[10px] text-neutral-500 uppercase tracking-wider block">
-                        03 // DIARIO VISUAL & REDES
+                        COLABORACIÓN & REDES // KRISS ECUADOR
                       </span>
                       <span className="text-white font-medium group-hover:text-[#C84B31] transition">
-                        @luisbermudez.design
+                        @krisecuador
                       </span>
                     </div>
-                    <div className="flex items-center gap-1 text-rose-400 text-[11px] font-semibold">
-                      <span>{lang === 'es' ? 'Ver Feed en Vivo' : 'View Feed'}</span>
+                    <div className="flex items-center gap-1 text-[#C84B31] text-[11px] font-semibold">
+                      <span>{lang === 'es' ? 'Ver Producción en Vivo' : 'View Live Feed'}</span>
                       <ArrowUpRight className="w-3.5 h-3.5 group-hover:translate-x-0.5 group-hover:-translate-y-0.5 transition" />
                     </div>
                   </a>
@@ -186,7 +186,7 @@ export const ContactSection: React.FC<ContactSectionProps> = ({ lang }) => {
               {/* Indicador de Disponibilidad y Ubicación */}
               <div className="pt-2 flex items-center justify-between text-[11px] font-mono text-neutral-400">
                 <div className="flex items-center gap-2">
-                  <span className="w-2 h-2 rounded-full bg-emerald-400 animate-pulse" />
+                  <span className="w-2 h-2 rounded-full bg-[#C84B31] animate-pulse" />
                   <span>
                     {lang === 'es' ? 'DISPONIBLE PARA PROYECTOS' : 'OPEN FOR SELECTED COMMISSIONS'}
                   </span>
@@ -199,7 +199,7 @@ export const ContactSection: React.FC<ContactSectionProps> = ({ lang }) => {
 
         {/* Barra de Cierre / Footer */}
         <div className="pt-16 mt-16 border-t border-white/10 flex flex-col sm:flex-row items-center justify-between gap-4 text-xs font-mono text-neutral-500">
-          <p>© 2026 Luis Bermúdez. Diseño Gráfico, Animación 2D/3D & Producción Audiovisual.</p>
+          <p>© 2026 Luis Bermúdez. Diseño Gráfico, Motion Graphics & Producción Audiovisual.</p>
           <div className="flex items-center gap-6">
             <a href="#root" className="hover:text-neutral-300 transition flex items-center gap-1">
               <span>{lang === 'es' ? 'Volver al inicio' : 'Back to top'}</span>

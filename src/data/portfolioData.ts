@@ -220,44 +220,44 @@ export interface CreativeDiscipline {
 
 export const CREATIVE_DISCIPLINES: CreativeDiscipline[] = [
   {
-    id: 'animacion-2d',
-    title: { es: 'Animación 2D & Motion Graphics', en: '2D Animation & Motion Graphics' },
+    id: 'motion-graphics',
+    title: { es: 'Motion Graphics & Edición de Video', en: 'Motion Graphics & Video Editing' },
     subtitle: { es: 'Cinemática, Ritmo & Tipografía en Movimiento', en: 'Cinematics, Momentum & Kinetic Type' },
     description: {
-      es: 'Diseño de movimiento y animación publicitaria. Creación de identidades dinámicas, intros cinemáticas, loops narrativos y motion typography en After Effects y Premiere Pro.',
-      en: 'Broadcast motion design and narrative animation. Dynamic identity systems, cinematic title intros, seamless social loops, and kinetic typography in After Effects & Premiere Pro.'
+      es: 'Trabajo el montaje, el color y la narrativa visual para crear piezas fluidas, estéticas y consistentes. Cuido el tempo, las transiciones, la tipografía cinética y la precisión técnica en After Effects y Premiere Pro.',
+      en: 'Crafting montage, color grading, and visual storytelling for fluid, consistent pieces. Precision timing, kinetic typography, and seamless transitions in After Effects & Premiere Pro.'
     },
-    tags: ['After Effects', 'Premiere Pro', 'Kinetic Typography', 'Loops Publicitarios', 'Storytelling Digital']
+    tags: ['After Effects', 'Premiere Pro', 'Kinetic Typography', 'Loops Publicitarios', 'Ritmo & Montaje']
   },
   {
-    id: 'animacion-3d',
-    title: { es: 'Animación & Modelado 3D', en: '3D Animation & Modeling' },
-    subtitle: { es: 'Composición Espacial & WebGL Interactivo', en: 'Spatial Composition & Interactive WebGL' },
+    id: 'produccion-audiovisual',
+    title: { es: 'Producción Audiovisual & Contenido Digital', en: 'Audiovisual Production & Digital Content' },
+    subtitle: { es: 'Luz, Ritmo, Color & Narrativa para Marcas', en: 'Light, Rhythm, Color & Brand Storytelling' },
     description: {
-      es: 'Modelado tridimensional, iluminación cinematográfica, texturizado volumétrico y experiencias interactivas en tiempo real combinando Cinema 4D, zBrush y Spline 3D.',
-      en: 'Volumetric 3D modeling, studio lighting, procedural shading, and real-time interactive experiences powered by Cinema 4D, zBrush, and Spline 3D.'
+      es: 'Planifico y construyo contenido en video y piezas pensadas para plataformas actuales (producciones para Kriss Ecuador y Minerva), integrando diseño, dirección de cámara y elementos visuales modernos con claridad, estética y utilidad.',
+      en: 'Planning and producing narrative video and digital content tailored for contemporary platforms (productions for Kriss Ecuador and Minerva), uniting camera direction, clarity, and utility.'
     },
-    tags: ['Cinema 4D', 'Spline 3D', 'zBrush', 'Lighting & Shading', 'WebGL Interactivo']
+    tags: ['Producción Audiovisual', 'Kriss Ecuador', 'Minerva', 'Dirección de Fotografía', 'Contenido Digital']
   },
   {
     id: 'diseno-editorial',
     title: { es: 'Diseño Editorial & Publicaciones', en: 'Editorial Design & Publications' },
     subtitle: { es: 'Jerarquía Shibui & Tipografía de Autor', en: 'Shibui Hierarchy & Custom Typography' },
     description: {
-      es: 'Maquetación de libros y revistas conceptuales de alta gama (Revista RAUN), publicaciones interactivas multimedia (EPUB/PDF como Dolores Veintimilla) y sistemas de retícula.',
+      es: 'Maquetación de libros y revistas conceptuales de alta gama (Revista RAUN), publicaciones interactivas multimedia (EPUB y PDF como Dolores Veintimilla) y sistemas de retícula donde el espacio en blanco marca el ritmo de lectura.',
       en: 'High-end conceptual book and magazine craft (RAUN Magazine), interactive multimedia digital publications (EPUB/PDF like Dolores Veintimilla), and asymmetric grid structures.'
     },
     tags: ['Adobe InDesign', 'Adobe Illustrator', 'EPUB Interactivo', 'Tipografía Patrimonial', 'Maquetación Shibui']
   },
   {
     id: 'direccion-arte',
-    title: { es: 'Dirección de Arte & Branding', en: 'Art Direction & Branding' },
-    subtitle: { es: 'Sistemas Visuales Rigurosos', en: 'Rigorous Visual Systems' },
+    title: { es: 'Diseño & Dirección de Arte', en: 'Design & Art Direction' },
+    subtitle: { es: 'Sistemas Visuales Limpios y Funcionales', en: 'Clean, Cohesive Visual Systems' },
     description: {
-      es: 'Construcción integral de identidad corporativa (IronWall, LegionFit). Manuales de marca, proporciones áureas, papelería fina y dirección estética multiplataforma.',
-      en: 'Complete brand identity architecture (IronWall, LegionFit). Standards manuals, golden-ratio marks, premium business stationery, and cross-platform art direction.'
+      es: 'Desarrollo composiciones visuales limpias y funcionales. Trabajo con estructura, tipografía y equilibrio para construir identidades corporativas (IronWall, LegionFit), manuales de marca, papelería fina y campañas digitales.',
+      en: 'Developing clean, functional visual compositions. Working with structure, typography, and balance to build brand identities (IronWall, LegionFit), brand manuals, and digital campaigns.'
     },
-    tags: ['Manuales de Marca', 'Geometría Vectorial', 'Papelería Corporativa', 'Campañas Digitales']
+    tags: ['Manuales de Marca', 'Geometría Vectorial', 'Papelería Corporativa', 'Identidad Visual']
   }
 ];
 
