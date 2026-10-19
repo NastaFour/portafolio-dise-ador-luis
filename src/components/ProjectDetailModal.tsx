@@ -105,7 +105,7 @@ export const ProjectDetailModal: React.FC<ProjectDetailModalProps> = ({
                 <ul className="space-y-1.5 text-sm text-neutral-300">
                   {project.details[lang].map((detail, idx) => (
                     <li key={idx} className="flex items-start gap-2">
-                      <span className="text-[#C84B31] font-bold">―</span>
+                      <span className="text-[#C84B31] font-bold">-</span>
                       <span>{detail}</span>
                     </li>
                   ))}

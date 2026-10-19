@@ -136,33 +136,35 @@ export const PORTFOLIO_PROJECTS: Project[] = [
     year: '2026',
     thumbnail: '/projects/ironwall/post_1_ironwall.png',
     logo: '/projects/ironwall/parte_frontalpng.png',
-    color: '#3A506B',
+    color: '#F0AB00',
     scope: [
       'Manual de Marca',
-      'Diseño de Tarjetas de Presentación',
+      'Diseño de Tarjetas de Presentación (85×55 mm)',
       'Campaña Instagram en Carruseles',
       'Sistemas de Retícula'
     ],
     description: {
-      es: 'Sistema integral de identidad corporativa para IronWall. Construcción de papelería sobria con acabados finos y dirección de arte en piezas de redes sociales basadas en grillas asimétricas, legibilidad geométrica y síntesis de marca.',
-      en: 'Comprehensive corporate identity system for IronWall. Production of tactile business stationery and art direction for social media carousels driven by asymmetric grids, typographic clarity, and brand synthesis.'
+      es: 'Sistema integral de identidad corporativa para IronWall. Construcción de papelería sobria en negro mate y oro industrial con acabados finos y dirección de arte en piezas de redes sociales basadas en grillas asimétricas, legibilidad geométrica y síntesis de marca.',
+      en: 'Comprehensive corporate identity system for IronWall. Production of tactile matte-black and industrial-gold business stationery and art direction for social media carousels driven by asymmetric grids, typographic clarity, and brand synthesis.'
     },
     details: {
       es: [
-        'Tarjetas de presentación con especificación de corte y acabados.',
+        'Tarjetas de presentación de doble cara (85 × 55 mm) con corte diagonal y código QR.',
         'Posts secuenciales de Instagram optimizados para retención.',
-        'Tipografía corporativa en variables Inter y Myriad.',
+        'Tipografía corporativa en variables Inter y Myriad Pro.',
         'Guía de aplicaciones en formatos físicos y digitales.'
       ],
       en: [
-        'Business card systems with precise print prep and finishing specs.',
+        'Double-sided business card system (85 × 55 mm) with diagonal geometry and QR integration.',
         'Multi-slide Instagram story and carousel architectures for engagement.',
-        'Corporate typography pairing variable font weights.',
+        'Corporate typography pairing Inter and Myriad Pro weights.',
         'Guidelines across physical packaging and digital communication.'
       ]
     },
     images: [
       '/projects/ironwall/post_1_ironwall.png',
+      '/projects/ironwall/parte_frontalpng.png',
+      '/projects/ironwall/parte_trasera.png',
       '/projects/ironwall/slide1.jpg',
       '/projects/ironwall/slide2.jpg',
       '/projects/ironwall/slide3.jpg',
@@ -178,7 +180,7 @@ export const PORTFOLIO_PROJECTS: Project[] = [
     year: '2025',
     thumbnail: '/projects/legionfit/plate_mockup.webp',
     logo: '/projects/legionfit/logo_badge.png',
-    color: '#E63946',
+    color: '#E06D2B',
     scope: [
       'Diseño de Logotipo',
       'Isotipo Geométrico',
