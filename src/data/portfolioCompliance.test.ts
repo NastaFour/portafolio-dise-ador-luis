@@ -137,4 +137,20 @@ describe('Portfolio Copy, 3D Objects & Mobile/PC Optimization Compliance (S1, S2
     expect(kineticFile).toContain('prefers-reduced-motion');
     expect(kineticFile).toContain('useGSAP');
   });
+
+  it('replaces native white Windows scrollbars with dark terracotta scrollbars and interactive Emakimono slider', () => {
+    const cssFile = fs.readFileSync(
+      path.join(ROOT_DIR, 'src/index.css'),
+      'utf-8'
+    );
+    const emakiFile = fs.readFileSync(
+      path.join(ROOT_DIR, 'src/components/JapaneseEmakimonoScroll.tsx'),
+      'utf-8'
+    );
+
+    expect(cssFile).toContain('::-webkit-scrollbar-button');
+    expect(cssFile).toContain('.no-scrollbar');
+    expect(emakiFile).toContain('no-scrollbar');
+    expect(emakiFile).toContain('role="slider"');
+  });
 });

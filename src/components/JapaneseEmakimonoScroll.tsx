@@ -1,16 +1,18 @@
-import React, { useRef, useState, useEffect } from 'react';
+import React, { useRef, useState, useEffect, useCallback } from 'react';
 import { ArrowLeft, ArrowRight, Sparkles, Film, BookOpen, PenTool, Clapperboard, Compass } from 'lucide-react';
+import { EditorialMotionGraphicBadge } from '@/components/ui/KineticMotion2D';
 
 interface JapaneseEmakimonoScrollProps {
   lang: 'es' | 'en';
 }
 
 interface ScrollSection {
-  number: string;
+  id: string;
   kanjiNumber: string;
   kanji: string;
   kanjiMeaning: { es: string; en: string };
   hankoSeal: string;
+  badgeVariant: 'bezier' | 'grid' | 'seal' | 'waveform';
   title: { es: string; en: string };
   subtitle: { es: string; en: string };
   description: { es: string; en: string };
@@ -24,11 +26,12 @@ interface ScrollSection {
 
 const EMAKI_SECTIONS: ScrollSection[] = [
   {
-    number: '01',
+    id: 'emaki-motion',
     kanjiNumber: '巻ノ一',
     kanji: '動',
-    kanjiMeaning: { es: 'MOVIMIENTO // DŌ', en: 'MOTION // DŌ' },
+    kanjiMeaning: { es: 'MOVIMIENTO · DŌ', en: 'MOTION · DŌ' },
     hankoSeal: '動',
+    badgeVariant: 'bezier',
     title: {
       es: 'After Effects & Motion Graphics',
       en: 'After Effects & Motion Graphics',
@@ -49,11 +52,12 @@ const EMAKI_SECTIONS: ScrollSection[] = [
     icon: Film,
   },
   {
-    number: '02',
+    id: 'emaki-editorial',
     kanjiNumber: '巻ノ二',
     kanji: '書',
-    kanjiMeaning: { es: 'EDITORIAL // SHO', en: 'EDITORIAL // SHO' },
+    kanjiMeaning: { es: 'EDITORIAL · SHO', en: 'EDITORIAL · SHO' },
     hankoSeal: '書',
+    badgeVariant: 'grid',
     title: {
       es: 'Diseño Editorial Shibui',
       en: 'Shibui Editorial Craft',
@@ -68,17 +72,18 @@ const EMAKI_SECTIONS: ScrollSection[] = [
     },
     highlight: {
       label: { es: 'OBRAS EMBLEMÁTICAS', en: 'BENCHMARK WORKS' },
-      value: 'Revista RAUN (N° 01) · Dolores Veintimilla (EPUB & PDF)',
+      value: 'Revista RAUN · Dolores Veintimilla (EPUB & PDF)',
     },
     tools: ['Adobe InDesign', 'Retícula Suiza', 'Drop-Caps', 'Canon Van de Graaf', 'Jerarquía Shibui'],
     icon: BookOpen,
   },
   {
-    number: '03',
+    id: 'emaki-identidad',
     kanjiNumber: '巻ノ三',
     kanji: '形',
-    kanjiMeaning: { es: 'IDENTIDAD // KATA', en: 'IDENTITY // KATA' },
+    kanjiMeaning: { es: 'IDENTIDAD · KATA', en: 'IDENTITY · KATA' },
     hankoSeal: '形',
+    badgeVariant: 'seal',
     title: {
       es: 'Identidad Visual & Dirección de Arte',
       en: 'Brand Architecture & Art Direction',
@@ -99,11 +104,12 @@ const EMAKI_SECTIONS: ScrollSection[] = [
     icon: PenTool,
   },
   {
-    number: '04',
+    id: 'emaki-audiovisual',
     kanjiNumber: '巻ノ四',
     kanji: '響',
-    kanjiMeaning: { es: 'RESONANCIA // HIBIKI', en: 'RHYTHM // HIBIKI' },
+    kanjiMeaning: { es: 'RESONANCIA · HIBIKI', en: 'RHYTHM · HIBIKI' },
     hankoSeal: '響',
+    badgeVariant: 'waveform',
     title: {
       es: 'Producción Audiovisual & Ritmo',
       en: 'Audiovisual Direction & Cadence',
@@ -124,11 +130,12 @@ const EMAKI_SECTIONS: ScrollSection[] = [
     icon: Clapperboard,
   },
   {
-    number: '05',
+    id: 'emaki-filosofia',
     kanjiNumber: '巻ノ末',
     kanji: '侘',
-    kanjiMeaning: { es: 'FILOSOFÍA // WABI', en: 'PHILOSOPHY // WABI' },
+    kanjiMeaning: { es: 'FILOSOFÍA · WABI', en: 'PHILOSOPHY · WABI' },
     hankoSeal: '印',
+    badgeVariant: 'seal',
     title: {
       es: 'La Filosofía de la Forja (Raun)',
       en: 'The Forge Philosophy (Raun)',
@@ -152,18 +159,25 @@ const EMAKI_SECTIONS: ScrollSection[] = [
 
 export const JapaneseEmakimonoScroll: React.FC<JapaneseEmakimonoScrollProps> = ({ lang }) => {
   const scrollContainerRef = useRef<HTMLDivElement>(null);
+  const sliderTrackRef = useRef<HTMLDivElement>(null);
   const [canScrollLeft, setCanScrollLeft] = useState(false);
   const [canScrollRight, setCanScrollRight] = useState(true);
   const [scrollProgress, setScrollProgress] = useState(0);
+  const [isDraggingTrack, setIsDraggingTrack] = useState(false);
+  const dragStateRef = useRef<{ isDown: boolean; startX: number; scrollLeft: number }>({
+    isDown: false,
+    startX: 0,
+    scrollLeft: 0,
+  });
 
-  const checkScroll = () => {
+  const checkScroll = useCallback(() => {
     const el = scrollContainerRef.current;
     if (!el) return;
     const maxScroll = el.scrollWidth - el.clientWidth;
     setCanScrollLeft(el.scrollLeft > 10);
     setCanScrollRight(el.scrollLeft < maxScroll - 10);
     setScrollProgress(maxScroll > 0 ? (el.scrollLeft / maxScroll) * 100 : 0);
-  };
+  }, []);
 
   useEffect(() => {
     const el = scrollContainerRef.current;
@@ -175,7 +189,7 @@ export const JapaneseEmakimonoScroll: React.FC<JapaneseEmakimonoScrollProps> = (
       el.removeEventListener('scroll', checkScroll);
       window.removeEventListener('resize', checkScroll);
     };
-  }, []);
+  }, [checkScroll]);
 
   const handleScroll = (direction: 'left' | 'right') => {
     const el = scrollContainerRef.current;
@@ -187,6 +201,55 @@ export const JapaneseEmakimonoScroll: React.FC<JapaneseEmakimonoScrollProps> = (
     });
   };
 
+  // Arrastre directo con puntero en el carril de tarjetas
+  const handleTrackMouseDown = (e: React.MouseEvent<HTMLDivElement>) => {
+    const el = scrollContainerRef.current;
+    if (!el) return;
+    dragStateRef.current = {
+      isDown: true,
+      startX: e.pageX - el.offsetLeft,
+      scrollLeft: el.scrollLeft,
+    };
+    setIsDraggingTrack(true);
+  };
+
+  const handleTrackMouseMove = (e: React.MouseEvent<HTMLDivElement>) => {
+    if (!dragStateRef.current.isDown) return;
+    const el = scrollContainerRef.current;
+    if (!el) return;
+    e.preventDefault();
+    const x = e.pageX - el.offsetLeft;
+    const walk = (x - dragStateRef.current.startX) * 1.35;
+    el.scrollLeft = dragStateRef.current.scrollLeft - walk;
+  };
+
+  const handleTrackMouseUp = () => {
+    dragStateRef.current.isDown = false;
+    setIsDraggingTrack(false);
+  };
+
+  // Control interactivo de la barra deslizadora inferior (scrubbing directo)
+  const scrubToClientX = useCallback((clientX: number) => {
+    const track = sliderTrackRef.current;
+    const el = scrollContainerRef.current;
+    if (!track || !el) return;
+    const rect = track.getBoundingClientRect();
+    if (rect.width <= 0) return;
+    const ratio = Math.max(0, Math.min(1, (clientX - rect.left) / rect.width));
+    const maxScroll = el.scrollWidth - el.clientWidth;
+    el.scrollLeft = ratio * maxScroll;
+  }, []);
+
+  const handleSliderPointerDown = (e: React.PointerEvent<HTMLDivElement>) => {
+    e.currentTarget.setPointerCapture(e.pointerId);
+    scrubToClientX(e.clientX);
+  };
+
+  const handleSliderPointerMove = (e: React.PointerEvent<HTMLDivElement>) => {
+    if (e.buttons !== 1) return;
+    scrubToClientX(e.clientX);
+  };
+
   return (
     <div className="space-y-8 select-none">
       {/* Cabecera del Rollo Japonés (Emakimono) */}
@@ -195,10 +258,10 @@ export const JapaneseEmakimonoScroll: React.FC<JapaneseEmakimonoScrollProps> = (
           <div className="flex items-center gap-2 mb-2">
             <span className="text-[10px] font-mono font-bold tracking-widest text-[#C84B31] uppercase bg-[#C84B31]/10 px-2.5 py-0.5 rounded border border-[#C84B31]/30 flex items-center gap-1.5">
               <Sparkles className="w-3 h-3 text-[#C84B31]" />
-              {lang === 'es' ? '絵巻物 // EMAKIMONO' : '絵巻物 // HORIZONTAL SCROLL'}
+              {lang === 'es' ? '絵巻物 · EMAKIMONO' : '絵巻物 · HORIZONTAL SCROLL'}
             </span>
             <span className="text-[10px] font-mono text-neutral-400 tracking-wider">
-              {lang === 'es' ? '[ 02 // ROLLO DE DISCIPLINAS & ENFOQUE ]' : '[ 02 // CRAFT SCROLL & DISCIPLINES ]'}
+              {lang === 'es' ? '[ ROLLO DE DISCIPLINAS & ENFOQUE ]' : '[ CRAFT SCROLL & DISCIPLINES ]'}
             </span>
           </div>
 
@@ -246,31 +309,37 @@ export const JapaneseEmakimonoScroll: React.FC<JapaneseEmakimonoScrollProps> = (
       {/* Contenedor del Rollo Japonés Horizontal con Rodillos Laterales */}
       <div className="relative group">
         {/* Rodillo Lateral Izquierdo (Eje Jiku 軸 de madera y latón) */}
-        <div className="hidden lg:flex absolute -left-4 top-0 bottom-6 w-3 bg-gradient-to-r from-[#111111] via-[#222222] to-[#141414] border-y-2 border-l border-[#C84B31]/60 rounded-l-md z-20 items-center justify-center pointer-events-none shadow-2xl">
+        <div className="hidden lg:flex absolute -left-4 top-0 bottom-2 w-3 bg-gradient-to-r from-[#111111] via-[#222222] to-[#141414] border-y-2 border-l border-[#C84B31]/60 rounded-l-md z-20 items-center justify-center pointer-events-none shadow-2xl">
           <div className="w-1 h-12 bg-[#C84B31]/40 rounded-full" />
         </div>
 
         {/* Rodillo Lateral Derecho (Eje Jiku 軸 de madera y latón) */}
-        <div className="hidden lg:flex absolute -right-4 top-0 bottom-6 w-3 bg-gradient-to-l from-[#111111] via-[#222222] to-[#141414] border-y-2 border-r border-[#C84B31]/60 rounded-r-md z-20 items-center justify-center pointer-events-none shadow-2xl">
+        <div className="hidden lg:flex absolute -right-4 top-0 bottom-2 w-3 bg-gradient-to-l from-[#111111] via-[#222222] to-[#141414] border-y-2 border-r border-[#C84B31]/60 rounded-r-md z-20 items-center justify-center pointer-events-none shadow-2xl">
           <div className="w-1 h-12 bg-[#C84B31]/40 rounded-full" />
         </div>
 
-        {/* Carril de Desplazamiento Horizontal (Scrollway Emakimono) */}
+        {/* Carril de Desplazamiento Horizontal (Scrollway Emakimono sin barra blanca nativa) */}
         <div
           ref={scrollContainerRef}
+          onMouseDown={handleTrackMouseDown}
+          onMouseMove={handleTrackMouseMove}
+          onMouseUp={handleTrackMouseUp}
+          onMouseLeave={handleTrackMouseUp}
           style={{
             touchAction: 'pan-x pan-y',
             WebkitOverflowScrolling: 'touch',
           }}
-          className="flex gap-4 sm:gap-6 overflow-x-auto snap-x snap-mandatory py-2 pb-6 px-1 sm:px-2 scrollbar-thin scrollbar-track-neutral-950 scrollbar-thumb-white/15 hover:scrollbar-thumb-[#C84B31]/50 focus:outline-none"
+          className={`no-scrollbar flex gap-4 sm:gap-6 overflow-x-auto snap-x snap-mandatory py-2 pb-3 px-1 sm:px-2 focus:outline-none ${
+            isDraggingTrack ? 'cursor-grabbing snap-none' : 'cursor-grab'
+          }`}
         >
-          {EMAKI_SECTIONS.map((section, index) => {
+          {EMAKI_SECTIONS.map((section) => {
             const Icon = section.icon;
 
             return (
               <article
-                key={section.number}
-                className="group/card relative flex-shrink-0 w-[88vw] sm:w-[460px] lg:w-[500px] snap-start rounded-2xl border border-white/10 bg-gradient-to-b from-[#181818] to-[#101010] p-6 sm:p-8 flex flex-col justify-between overflow-hidden shadow-2xl transition-all duration-300 hover:border-[#C84B31]/70 hover:shadow-[0_12px_40px_rgba(200,75,49,0.12)]"
+                key={section.id}
+                className="group/card relative flex-shrink-0 w-[86vw] sm:w-[460px] lg:w-[500px] snap-start rounded-tl-[32px] rounded-br-[32px] rounded-tr-xl rounded-bl-xl border border-white/10 bg-gradient-to-b from-[#181818] to-[#101010] p-6 sm:p-8 flex flex-col justify-between overflow-hidden shadow-2xl transition-all duration-300 hover:border-[#C84B31]/70 hover:shadow-[0_12px_40px_rgba(200,75,49,0.12)]"
               >
                 {/* Gran Marca de Agua Caligráfica Japonesa en el Fondo */}
                 <div className="absolute -top-6 -right-4 text-8xl sm:text-9xl font-serif font-black text-white/[0.025] group-hover/card:text-[#C84B31]/[0.06] transition-colors duration-500 select-none pointer-events-none leading-none z-0">
@@ -284,9 +353,6 @@ export const JapaneseEmakimonoScroll: React.FC<JapaneseEmakimonoScrollProps> = (
                       <div className="flex items-center gap-2">
                         <span className="font-mono text-xs font-bold text-[#C84B31] tracking-wider">
                           {section.kanjiNumber}
-                        </span>
-                        <span className="text-[10px] font-mono text-neutral-500 uppercase">
-                          // 0{index + 1}
                         </span>
                         <span className="text-[10px] font-mono text-neutral-400">
                           [{section.kanjiMeaning[lang]}]
@@ -311,10 +377,18 @@ export const JapaneseEmakimonoScroll: React.FC<JapaneseEmakimonoScrollProps> = (
                     </div>
                   </div>
 
-                  {/* Subtítulo de Técnica & Enfoque */}
-                  <div className="flex items-center gap-2 text-xs font-mono text-[#C84B31] mb-3">
-                    <Icon className="w-3.5 h-3.5 shrink-0" />
-                    <span className="line-clamp-1">{section.subtitle[lang]}</span>
+                  {/* Subtítulo de Técnica & Enfoque + Motion Graphic 2D */}
+                  <div className="flex items-center justify-between gap-2 mb-3">
+                    <div className="flex items-center gap-2 text-xs font-mono text-[#C84B31]">
+                      <Icon className="w-3.5 h-3.5 shrink-0" />
+                      <span className="line-clamp-1">{section.subtitle[lang]}</span>
+                    </div>
+                    <div className="hidden sm:inline-flex shrink-0">
+                      <EditorialMotionGraphicBadge
+                        variant={section.badgeVariant}
+                        accentColor="#C84B31"
+                      />
+                    </div>
                   </div>
 
                   {/* Texto Editorial del Capítulo */}
@@ -353,12 +427,30 @@ export const JapaneseEmakimonoScroll: React.FC<JapaneseEmakimonoScrollProps> = (
         </div>
       </div>
 
-      {/* Barra de Progreso del Despliegue del Rollo (Estilo Cinta de Seda Roja) */}
+      {/* Barra Deslizadora Interactiva del Despliegue del Rollo (Estilo Cinta de Seda Roja) */}
       <div className="flex items-center justify-between gap-4 pt-1">
-        <div className="relative w-full h-1 bg-white/10 rounded-full overflow-hidden">
+        <div
+          ref={sliderTrackRef}
+          onPointerDown={handleSliderPointerDown}
+          onPointerMove={handleSliderPointerMove}
+          role="slider"
+          aria-label={lang === 'es' ? 'Barra deslizadora de capítulos Emaki' : 'Emaki chapters slider bar'}
+          aria-valuemin={0}
+          aria-valuemax={100}
+          aria-valuenow={Math.round(scrollProgress)}
+          tabIndex={0}
+          className="relative w-full h-5 flex items-center cursor-pointer group/slider"
+        >
+          <div className="relative w-full h-1.5 bg-white/10 rounded-full overflow-hidden">
+            <div
+              className="absolute top-0 left-0 bottom-0 bg-[#C84B31] transition-all duration-100 rounded-full shadow-[0_0_8px_#C84B31]"
+              style={{ width: `${Math.max(12, scrollProgress)}%` }}
+            />
+          </div>
+          {/* Pulgar táctil de la barra deslizadora */}
           <div
-            className="absolute top-0 left-0 bottom-0 bg-[#C84B31] transition-all duration-150 rounded-full shadow-[0_0_8px_#C84B31]"
-            style={{ width: `${Math.max(12, scrollProgress)}%` }}
+            className="absolute top-1/2 -translate-y-1/2 -translate-x-1/2 w-3.5 h-3.5 rounded-full bg-[#C84B31] border-2 border-[#E8E4DC] shadow-[0_0_12px_#C84B31] transition-transform duration-150 group-hover/slider:scale-125"
+            style={{ left: `${Math.max(4, Math.min(98, scrollProgress))}%` }}
           />
         </div>
 

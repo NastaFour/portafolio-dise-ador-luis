@@ -133,6 +133,54 @@
   transform-style: preserve-3d;
 }
 
+/* Barras deslizadoras editoriales oscuras (elimina barras blancas nativas de Windows en Chrome/Edge/Firefox) */
+::-webkit-scrollbar {
+  width: 6px;
+  height: 6px;
+}
+
+::-webkit-scrollbar-button {
+  display: none;
+  width: 0;
+  height: 0;
+}
+
+::-webkit-scrollbar-track {
+  background: #111111;
+}
+
+::-webkit-scrollbar-thumb {
+  background: rgba(200, 75, 49, 0.45);
+  border-radius: 9999px;
+}
+
+::-webkit-scrollbar-thumb:hover {
+  background: #C84B31;
+}
+
+::-webkit-scrollbar-corner {
+  background: #111111;
+}
+
+@supports not selector(::-webkit-scrollbar) {
+  * {
+    scrollbar-width: thin;
+    scrollbar-color: rgba(200, 75, 49, 0.45) #111111;
+  }
+}
+
+/* Ocultar barra nativa en carriles horizontales con barra deslizadora propia (Emakimono) */
+.no-scrollbar {
+  -ms-overflow-style: none !important;
+  scrollbar-width: none !important;
+}
+
+.no-scrollbar::-webkit-scrollbar {
+  display: none !important;
+  width: 0 !important;
+  height: 0 !important;
+}
+
 /* Ocultar marca de agua Built with Spline en DOM y Shadow DOM */
 a[href*="spline.design"],
 #spline-watermark,
