@@ -409,11 +409,7 @@ export const EndorserCredibilityStrip: React.FC<EndorserBannerProps> = ({ lang }
                 </p>
 
                 <div className="pt-2 border-t border-white/10 flex items-center justify-between text-[10px] font-mono text-neutral-400">
-                  <span className="flex items-center gap-1.5">
-                    <span
-                      className="w-1.5 h-1.5 rounded-full"
-                      style={{ backgroundColor: item.accent }}
-                    />
+                  <span>
                     {lang === 'es' ? 'REFERENCIA VERIFICADA' : 'VERIFIED REFERENCE'}
                   </span>
                   {item.href && (

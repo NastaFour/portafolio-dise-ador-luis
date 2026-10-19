@@ -153,4 +153,21 @@ describe('Portfolio Copy, 3D Objects & Mobile/PC Optimization Compliance (S1, S2
     expect(emakiFile).toContain('no-scrollbar');
     expect(emakiFile).toContain('role="slider"');
   });
+
+  it('exposes visible mobile navigation buttons in HeaderNav and eliminates decorative dots and slashes in Hero', () => {
+    const headerFile = fs.readFileSync(
+      path.join(ROOT_DIR, 'src/components/HeaderNav.tsx'),
+      'utf-8'
+    );
+    const heroFile = fs.readFileSync(
+      path.join(ROOT_DIR, 'src/components/ui/3d-hero-section-boxes.tsx'),
+      'utf-8'
+    );
+
+    expect(headerFile).toContain('aria-label="Navegación móvil"');
+    expect(headerFile).toContain('flex md:hidden');
+    expect(heroFile).not.toContain('PORTFOLIO //');
+    expect(heroFile).not.toContain('• {pillar}');
+    expect(heroFile).not.toContain('Motion Graphics /');
+  });
 });

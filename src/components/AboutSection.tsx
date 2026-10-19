@@ -41,7 +41,7 @@ export const AboutSection: React.FC<AboutSectionProps> = ({ lang }) => {
             <div className="flex items-center gap-3 shrink-0">
               <EditorialMotionGraphicBadge variant="seal" accentColor="#C84B31" />
               <div className="text-[10px] font-mono uppercase tracking-widest text-neutral-400">
-                <span className="block text-[#E8E4DC] font-semibold">SHIBUI · MA · RAUN</span>
+                <span className="block text-[#E8E4DC] font-semibold">SHIBUI, MA & RAUN</span>
                 <span>{lang === 'es' ? 'CRITERIO DE AUTOR' : 'AUTHORIAL CRAFT'}</span>
               </div>
             </div>
@@ -210,8 +210,8 @@ export const AboutSection: React.FC<AboutSectionProps> = ({ lang }) => {
               <div className="border-l-2 border-[#C84B31] bg-white/[0.02] p-5 sm:p-6 rounded-r-xl space-y-2">
                 <h4 className="text-base sm:text-lg font-display font-bold text-white tracking-wide">
                   {lang === 'es'
-                    ? 'Shibui (渋い) · La elegancia simple'
-                    : 'Shibui (渋い) · Understated Elegance'}
+                    ? 'Shibui (渋い) — La elegancia simple'
+                    : 'Shibui (渋い) — Understated Elegance'}
                 </h4>
                 <p className="text-xs sm:text-sm text-neutral-400 font-sans leading-relaxed">
                   {lang === 'es'
@@ -232,13 +232,13 @@ export const AboutSection: React.FC<AboutSectionProps> = ({ lang }) => {
                     <span className="text-[#C84B31] text-[10px] tracking-wider uppercase font-semibold">
                       MOTION & AUDIOVISUAL
                     </span>
-                    <span className="text-white">After Effects · Premiere Pro · Audition</span>
+                    <span className="text-white">After Effects, Premiere Pro, Audition</span>
                   </div>
                   <div className="p-3 rounded-lg bg-white/[0.02] border border-white/10 flex flex-col gap-1">
                     <span className="text-[#C84B31] text-[10px] tracking-wider uppercase font-semibold">
                       DISEÑO EDITORIAL & MARCA
                     </span>
-                    <span className="text-white">InDesign · Illustrator · Photoshop · Lightroom</span>
+                    <span className="text-white">InDesign, Illustrator, Photoshop, Lightroom</span>
                   </div>
                 </div>
               </div>

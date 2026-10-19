@@ -920,7 +920,6 @@ export const PretextCurlingSection: React.FC<PretextCurlingSectionProps> = ({
 
             {/* Indicador de Interacción */}
             <div className="pt-3 sm:pt-4 text-xs tracking-wider text-neutral-500 uppercase flex items-center gap-2">
-              <span className="inline-block w-2 h-2 rounded-full bg-[#C84B31]/70 animate-pulse" />
               {manifesto.hint}
             </div>
           </div>
@@ -1008,7 +1007,7 @@ export const PretextCurlingSection: React.FC<PretextCurlingSectionProps> = ({
                 {/* Tooltip de Luis Autor */}
                 {isHovered && !isProject && (
                   <div className="absolute -top-9 left-1/2 -translate-x-1/2 px-3 py-1 bg-neutral-900/95 border border-[#C84B31]/40 rounded-full text-[10px] text-white whitespace-nowrap shadow-2xl backdrop-blur-md flex items-center gap-1.5 pointer-events-none animate-in fade-in zoom-in-95">
-                    <span>Luis Bermúdez • Autor</span>
+                    <span>Luis Bermúdez — Autor</span>
                   </div>
                 )}
               </div>

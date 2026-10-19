@@ -39,7 +39,7 @@ export const ProjectShowcase: React.FC<ProjectShowcaseProps> = ({
           <div className="lg:col-span-5 bg-[#171717] border border-white/10 p-6 sm:p-8 rounded-tl-none rounded-br-none rounded-tr-[48px] rounded-bl-[48px] flex flex-col justify-between space-y-6">
             <div className="space-y-3">
               <span className="text-[11px] font-mono uppercase tracking-[0.22em] text-[#C84B31] font-semibold block">
-                {lang === 'es' ? 'ESTRUCTURA · LUZ · RITMO · COLOR' : 'STRUCTURE · LIGHT · RHYTHM · COLOR'}
+                {lang === 'es' ? 'ESTRUCTURA, LUZ, RITMO Y COLOR' : 'STRUCTURE, LIGHT, RHYTHM & COLOR'}
               </span>
               <KineticText
                 as="h2"
@@ -234,14 +234,10 @@ export const ProjectShowcase: React.FC<ProjectShowcaseProps> = ({
 
                   {/* Barra inferior interactiva */}
                   <div className="relative z-20 bg-black/75 border-t border-white/10 px-4 sm:px-6 py-3 flex items-center justify-between text-[11px] font-mono text-neutral-300">
-                    <span className="flex items-center gap-2">
-                      <span
-                        className="w-2 h-2 rounded-full"
-                        style={{ backgroundColor: project.color }}
-                      />
+                    <span>
                       {lang === 'es'
-                        ? 'Mueve para inspeccionar · Clic para abrir pliegos'
-                        : 'Move to inspect · Click to open plates'}
+                        ? 'Mueve para inspeccionar — Clic para abrir pliegos'
+                        : 'Move to inspect — Click to open plates'}
                     </span>
                     <span className="text-[#C84B31] font-semibold">
                       {project.images.length} {lang === 'es' ? 'LÁMINAS' : 'PLATES'} ↗

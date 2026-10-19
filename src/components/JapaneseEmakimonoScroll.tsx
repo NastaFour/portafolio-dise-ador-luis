@@ -29,7 +29,7 @@ const EMAKI_SECTIONS: ScrollSection[] = [
     id: 'emaki-motion',
     kanjiNumber: '巻ノ一',
     kanji: '動',
-    kanjiMeaning: { es: 'MOVIMIENTO · DŌ', en: 'MOTION · DŌ' },
+    kanjiMeaning: { es: 'MOVIMIENTO — DŌ', en: 'MOTION — DŌ' },
     hankoSeal: '動',
     badgeVariant: 'bezier',
     title: {
@@ -46,7 +46,7 @@ const EMAKI_SECTIONS: ScrollSection[] = [
     },
     highlight: {
       label: { es: 'CLIENTES & APLICACIÓN', en: 'CLIENTS & DOMAIN' },
-      value: 'Kriss Ecuador · Minerva · Intros Publicitarias & Loops',
+      value: 'Kriss Ecuador, Minerva, Intros Publicitarias & Loops',
     },
     tools: ['After Effects', 'Premiere Pro', 'Curvas Bézier', 'Kinetic Typography', 'Audio Sync'],
     icon: Film,
@@ -55,7 +55,7 @@ const EMAKI_SECTIONS: ScrollSection[] = [
     id: 'emaki-editorial',
     kanjiNumber: '巻ノ二',
     kanji: '書',
-    kanjiMeaning: { es: 'EDITORIAL · SHO', en: 'EDITORIAL · SHO' },
+    kanjiMeaning: { es: 'EDITORIAL — SHO', en: 'EDITORIAL — SHO' },
     hankoSeal: '書',
     badgeVariant: 'grid',
     title: {
@@ -72,7 +72,7 @@ const EMAKI_SECTIONS: ScrollSection[] = [
     },
     highlight: {
       label: { es: 'OBRAS EMBLEMÁTICAS', en: 'BENCHMARK WORKS' },
-      value: 'Revista RAUN · Dolores Veintimilla (EPUB & PDF)',
+      value: 'Revista RAUN y Dolores Veintimilla (EPUB & PDF)',
     },
     tools: ['Adobe InDesign', 'Retícula Suiza', 'Drop-Caps', 'Canon Van de Graaf', 'Jerarquía Shibui'],
     icon: BookOpen,
@@ -81,7 +81,7 @@ const EMAKI_SECTIONS: ScrollSection[] = [
     id: 'emaki-identidad',
     kanjiNumber: '巻ノ三',
     kanji: '形',
-    kanjiMeaning: { es: 'IDENTIDAD · KATA', en: 'IDENTITY · KATA' },
+    kanjiMeaning: { es: 'IDENTIDAD — KATA', en: 'IDENTITY — KATA' },
     hankoSeal: '形',
     badgeVariant: 'seal',
     title: {
@@ -98,7 +98,7 @@ const EMAKI_SECTIONS: ScrollSection[] = [
     },
     highlight: {
       label: { es: 'CLIENTES & MARCAS', en: 'BRANDS & COLLABORATIONS' },
-      value: 'Kriss Ecuador · Minerva · IronWall · LegionFit',
+      value: 'Kriss Ecuador, Minerva, IronWall, LegionFit',
     },
     tools: ['Adobe Illustrator', 'Manuales de Marca', 'Geometría Vectorial', 'Papelería Fina', 'Dirección de Arte'],
     icon: PenTool,
@@ -107,7 +107,7 @@ const EMAKI_SECTIONS: ScrollSection[] = [
     id: 'emaki-audiovisual',
     kanjiNumber: '巻ノ四',
     kanji: '響',
-    kanjiMeaning: { es: 'RESONANCIA · HIBIKI', en: 'RHYTHM · HIBIKI' },
+    kanjiMeaning: { es: 'RESONANCIA — HIBIKI', en: 'RHYTHM — HIBIKI' },
     hankoSeal: '響',
     badgeVariant: 'waveform',
     title: {
@@ -124,7 +124,7 @@ const EMAKI_SECTIONS: ScrollSection[] = [
     },
     highlight: {
       label: { es: 'PIPELINE AUDIOVISUAL', en: 'PRODUCTION PIPELINE' },
-      value: 'Premiere Pro · Sincronización Musical · Etalonaje · Comercial',
+      value: 'Premiere Pro, Sincronización Musical, Etalonaje, Comercial',
     },
     tools: ['Adobe Premiere Pro', 'Corte Rítmico', 'Color Grading', 'Sound Design Sync', 'Dirección'],
     icon: Clapperboard,
@@ -133,7 +133,7 @@ const EMAKI_SECTIONS: ScrollSection[] = [
     id: 'emaki-filosofia',
     kanjiNumber: '巻ノ末',
     kanji: '侘',
-    kanjiMeaning: { es: 'FILOSOFÍA · WABI', en: 'PHILOSOPHY · WABI' },
+    kanjiMeaning: { es: 'FILOSOFÍA — WABI', en: 'PHILOSOPHY — WABI' },
     hankoSeal: '印',
     badgeVariant: 'seal',
     title: {
@@ -150,7 +150,7 @@ const EMAKI_SECTIONS: ScrollSection[] = [
     },
     highlight: {
       label: { es: 'CONFIANZA & ALIANZAS', en: 'TRUSTED BY' },
-      value: 'Kriss Ecuador · Minerva · ISTER',
+      value: 'Kriss Ecuador, Minerva, ISTER',
     },
     tools: ['Shibui (Elegancia)', 'Ma (Vacío)', 'Wabi-Sabi', 'Raun (Crisol)', 'Rigor Suizo'],
     icon: Compass,
@@ -258,7 +258,7 @@ export const JapaneseEmakimonoScroll: React.FC<JapaneseEmakimonoScrollProps> = (
           <div className="flex items-center gap-2 mb-2">
             <span className="text-[10px] font-mono font-bold tracking-widest text-[#C84B31] uppercase bg-[#C84B31]/10 px-2.5 py-0.5 rounded border border-[#C84B31]/30 flex items-center gap-1.5">
               <Sparkles className="w-3 h-3 text-[#C84B31]" />
-              {lang === 'es' ? '絵巻物 · EMAKIMONO' : '絵巻物 · HORIZONTAL SCROLL'}
+              {lang === 'es' ? '絵巻物 EMAKIMONO' : '絵巻物 HORIZONTAL SCROLL'}
             </span>
             <span className="text-[10px] font-mono text-neutral-400 tracking-wider">
               {lang === 'es' ? '[ ROLLO DE DISCIPLINAS & ENFOQUE ]' : '[ CRAFT SCROLL & DISCIPLINES ]'}
@@ -454,8 +454,7 @@ export const JapaneseEmakimonoScroll: React.FC<JapaneseEmakimonoScrollProps> = (
           />
         </div>
 
-        <div className="shrink-0 text-[10px] font-mono text-neutral-400 flex items-center gap-1.5">
-          <span className="w-1.5 h-1.5 rounded-full bg-[#C84B31] animate-pulse" />
+        <div className="shrink-0 text-[10px] font-mono text-neutral-400">
           <span>{lang === 'es' ? '5 CAPÍTULOS EMAKI' : '5 EMAKI CHAPTERS'}</span>
         </div>
       </div>

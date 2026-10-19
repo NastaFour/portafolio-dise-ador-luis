@@ -41,7 +41,7 @@ export const PORTFOLIO_PROJECTS: Project[] = [
     id: 'raun',
     slug: 'revista-raun',
     title: 'Revista RAUN',
-    subtitle: 'Diseño con Espíritu / Wabi-Sabi & Shibui',
+    subtitle: 'Diseño con Espíritu, Wabi-Sabi & Shibui',
     category: 'Diseño Editorial & Concepto',
     year: '2026',
     thumbnail: '/projects/raun/raun_page_01.jpg',

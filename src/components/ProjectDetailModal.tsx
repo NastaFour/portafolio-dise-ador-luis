@@ -55,9 +55,8 @@ export const ProjectDetailModal: React.FC<ProjectDetailModalProps> = ({
 
           {/* Header del Caso */}
           <div className="mb-8 pr-12">
-            <div className="flex items-center gap-3 text-xs uppercase tracking-widest text-[#C84B31] font-semibold mb-2">
+            <div className="flex items-center gap-4 text-xs uppercase tracking-widest text-[#C84B31] font-semibold mb-2">
               <span>{project.category}</span>
-              <span>·</span>
               <span className="flex items-center gap-1">
                 <Calendar className="w-3 h-3" />
                 {project.year}
@@ -116,7 +115,7 @@ export const ProjectDetailModal: React.FC<ProjectDetailModalProps> = ({
             <div>
               <h3 className="text-sm font-semibold tracking-wider text-neutral-300 uppercase mb-3 flex items-center gap-2">
                 <Layers className="w-4 h-4 text-[#C84B31]" />
-                {lang === 'es' ? 'Alcance / Servicios' : 'Scope / Services'}
+                {lang === 'es' ? 'Alcance y Servicios' : 'Scope & Services'}
               </h3>
               <ul className="space-y-2">
                 {project.scope.map((item, idx) => (

@@ -134,8 +134,8 @@ export const ContactSection: React.FC<ContactSectionProps> = ({ lang }) => {
               <div className="border-l-2 border-[#C84B31] bg-white/[0.02] p-5 sm:p-6 rounded-r-xl space-y-2">
                 <h4 className="text-base sm:text-lg font-display font-bold text-white tracking-wide">
                   {lang === 'es'
-                    ? 'El Diálogo · Rigor y Transparencia'
-                    : 'The Dialogue · Rigor & Transparency'}
+                    ? 'El Diálogo — Rigor y Transparencia'
+                    : 'The Dialogue — Rigor & Transparency'}
                 </h4>
                 <p className="text-xs sm:text-sm text-neutral-400 font-sans leading-relaxed">
                   {lang === 'es'
@@ -144,7 +144,7 @@ export const ContactSection: React.FC<ContactSectionProps> = ({ lang }) => {
                 </p>
               </div>
 
-              {/* Canales Directos en Ledger Arquitectónico (Sin números decorativos 01/02/03) */}
+              {/* Canales Directos en Ledger Arquitectónico */}
               <div className="space-y-3 pt-2">
                 <span className="text-[10px] font-mono text-neutral-400 uppercase tracking-widest block">
                   {lang === 'es'
@@ -160,7 +160,7 @@ export const ContactSection: React.FC<ContactSectionProps> = ({ lang }) => {
                   >
                     <div className="space-y-0.5">
                       <span className="text-[10px] text-neutral-500 uppercase tracking-wider block">
-                        CORREO ELECTRÓNICO // DIRECTO
+                        CORREO ELECTRÓNICO DIRECTO
                       </span>
                       <span className="text-white font-medium group-hover:text-[#C84B31] transition break-all">
                         luismiguelbermudezgarrido6@gmail.com
@@ -181,7 +181,7 @@ export const ContactSection: React.FC<ContactSectionProps> = ({ lang }) => {
                   >
                     <div className="space-y-0.5">
                       <span className="text-[10px] text-neutral-500 uppercase tracking-wider block">
-                        WHATSAPP // LÍNEA DIRECTA
+                        WHATSAPP LÍNEA DIRECTA
                       </span>
                       <span className="text-white font-medium group-hover:text-[#C84B31] transition">
                         +593 96 254 8594
@@ -202,7 +202,7 @@ export const ContactSection: React.FC<ContactSectionProps> = ({ lang }) => {
                   >
                     <div className="space-y-0.5">
                       <span className="text-[10px] text-neutral-500 uppercase tracking-wider block">
-                        COLABORACIÓN & REDES // KRISS ECUADOR
+                        COLABORACIÓN & REDES KRISS ECUADOR
                       </span>
                       <span className="text-white font-medium group-hover:text-[#C84B31] transition">
                         @krisecuador
@@ -218,15 +218,12 @@ export const ContactSection: React.FC<ContactSectionProps> = ({ lang }) => {
 
               {/* Indicador de Disponibilidad y Ubicación */}
               <div className="pt-2 flex items-center justify-between text-[11px] font-mono text-neutral-400">
-                <div className="flex items-center gap-2">
-                  <span className="w-2 h-2 rounded-full bg-[#C84B31] animate-pulse" />
-                  <span>
-                    {lang === 'es'
-                      ? 'DISPONIBLE PARA PROYECTOS'
-                      : 'OPEN FOR SELECTED COMMISSIONS'}
-                  </span>
-                </div>
-                <span className="text-neutral-500">QUITO, ECUADOR · REMOTO GLOBAL</span>
+                <span>
+                  {lang === 'es'
+                    ? 'DISPONIBLE PARA PROYECTOS'
+                    : 'OPEN FOR SELECTED COMMISSIONS'}
+                </span>
+                <span className="text-neutral-500">QUITO, ECUADOR — REMOTO GLOBAL</span>
               </div>
             </div>
           </div>

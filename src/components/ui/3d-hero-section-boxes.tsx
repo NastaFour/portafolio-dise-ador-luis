@@ -180,26 +180,6 @@ function HeroAuthorSculptureCanvas() {
       folioMeshes.push(mesh);
     });
 
-    // 4. Polvo atmosférico de taller (Partículas sutiles)
-    const particleCount = isMobile ? 45 : 90;
-    const positions = new Float32Array(particleCount * 3);
-    for (let i = 0; i < particleCount; i++) {
-      positions[i * 3] = (Math.random() - 0.5) * 11;
-      positions[i * 3 + 1] = (Math.random() - 0.5) * 7;
-      positions[i * 3 + 2] = (Math.random() - 0.5) * 6;
-    }
-    const particleGeo = new THREE.BufferGeometry();
-    particleGeo.setAttribute('position', new THREE.BufferAttribute(positions, 3));
-    const particleMat = new THREE.PointsMaterial({
-      color: new THREE.Color('#D4A373'),
-      size: isMobile ? 0.035 : 0.045,
-      transparent: true,
-      opacity: 0.55,
-    });
-    disposables.push(particleGeo, particleMat);
-    const particles = new THREE.Points(particleGeo, particleMat);
-    scene.add(particles);
-
     // Interacción suave con puntero y soporte para prefers-reduced-motion
     const pointer = { x: 0, y: 0, targetX: 0, targetY: 0 };
     const prefersReducedMotion = window.matchMedia?.('(prefers-reduced-motion: reduce)').matches;
@@ -263,8 +243,6 @@ function HeroAuthorSculptureCanvas() {
           mesh.position.y = baseY + Math.sin(t * 1.1 + idx * 1.4) * 0.14;
           mesh.rotation.y = -currentAngle * 0.45 + pointer.x * 0.2;
         });
-
-        particles.rotation.y = t * 0.03;
       }
 
       renderer.render(scene, camera);
@@ -325,7 +303,7 @@ function HeroContent({ lang = 'es' }: HeroContentProps) {
       : ['Clarity', 'Visual Order', 'Visual Aesthetics', 'Intent in Every Detail'];
 
   return (
-    <div className="text-white px-4 sm:px-8 max-w-7xl mx-auto w-full flex flex-col lg:flex-row justify-between items-start lg:items-end pt-24 pb-12 sm:py-16 gap-8 sm:gap-12">
+    <div className="text-white px-4 sm:px-8 max-w-7xl mx-auto w-full flex flex-col lg:flex-row justify-between items-start lg:items-end pt-32 pb-12 sm:py-16 gap-8 sm:gap-12">
       {/* Columna Izquierda: Retrato con Geometría de Firma PDF + Tipografía Cinética */}
       <div className="w-full lg:w-3/5 space-y-5 sm:space-y-6">
         <div className="flex items-center gap-4 sm:gap-6">
@@ -339,24 +317,21 @@ function HeroContent({ lang = 'es' }: HeroContentProps) {
             <div className="absolute inset-0 ring-1 ring-inset ring-[#C84B31]/40 pointer-events-none rounded-tr-[36px] rounded-bl-[36px] sm:rounded-tr-[48px] sm:rounded-bl-[48px]" />
           </div>
 
-          {/* Sello Editorial "portfolio" (Pág. 1 del PDF de Luis) */}
-          <div className="space-y-2">
-            <div className="inline-flex items-center gap-2 px-3 py-1 rounded-full bg-white/[0.04] border border-white/10">
-              <span className="w-1.5 h-1.5 rounded-full bg-[#C84B31]" />
-              <span className="text-[10px] sm:text-xs font-mono uppercase tracking-[0.22em] text-neutral-300">
-                {lang === 'es'
-                  ? 'PORTFOLIO // DISEÑO & PRODUCCIÓN AUDIOVISUAL'
-                  : 'PORTFOLIO // DESIGN & AUDIOVISUAL PRODUCTION'}
-              </span>
-            </div>
+          {/* Encabezado Editorial Limpio (Sin puntos ni barras diagonales) */}
+          <div className="space-y-2.5 border-l-2 border-[#C84B31] pl-3.5 sm:pl-4">
+            <span className="block text-[10px] sm:text-xs font-mono uppercase tracking-[0.22em] text-[#C84B31] font-semibold">
+              {lang === 'es'
+                ? 'PORTAFOLIO DE DISEÑO & PRODUCCIÓN AUDIOVISUAL'
+                : 'DESIGN & AUDIOVISUAL PRODUCTION PORTFOLIO'}
+            </span>
 
-            <div className="flex flex-wrap gap-1.5 pt-1">
+            <div className="flex flex-wrap gap-x-4 gap-y-1">
               {pillars.map((pillar) => (
                 <span
                   key={pillar}
-                  className="text-[10px] sm:text-[11px] font-mono px-2.5 py-0.5 rounded bg-white/[0.03] border border-white/10 text-neutral-300"
+                  className="text-xs sm:text-sm font-display italic text-neutral-200"
                 >
-                  • {pillar}
+                  {pillar}
                 </span>
               ))}
             </div>
@@ -370,12 +345,12 @@ function HeroContent({ lang = 'es' }: HeroContentProps) {
             className="text-4xl sm:text-6xl lg:text-7xl font-bold font-display leading-[0.98] tracking-[-0.03em] text-[#E8E4DC]"
           />
 
-          <div className="text-[11px] sm:text-sm tracking-[0.2em] text-[#C84B31] font-semibold mt-3 sm:mt-4 uppercase flex items-center gap-3">
-            <span className="w-8 h-[1.5px] bg-[#C84B31] inline-block" />
+          <div className="text-[11px] sm:text-sm tracking-[0.16em] text-[#C84B31] font-semibold mt-3 sm:mt-4 uppercase flex items-center gap-3">
+            <span className="w-8 h-[1.5px] bg-[#C84B31] inline-block shrink-0" />
             <span>
               {lang === 'es'
-                ? 'Motion Graphics / Dirección de Arte / Diseño Editorial / Producción Audiovisual'
-                : 'Motion Graphics / Art Direction / Editorial Design / Audiovisual Production'}
+                ? 'Motion Graphics, Dirección de Arte, Diseño Editorial y Producción Audiovisual'
+                : 'Motion Graphics, Art Direction, Editorial Design & Audiovisual Production'}
             </span>
           </div>
         </div>
@@ -387,14 +362,14 @@ function HeroContent({ lang = 'es' }: HeroContentProps) {
           <EditorialMotionGraphicBadge variant="bezier" accentColor="#C84B31" />
           <EditorialMotionGraphicBadge variant="waveform" accentColor="#D4A373" />
           <span className="text-[10px] font-mono uppercase tracking-widest text-neutral-400">
-            {lang === 'es' ? 'COMPOSICIÓN · ORDEN · DETALLE' : 'COMPOSITION · ORDER · DETAIL'}
+            {lang === 'es' ? 'COMPOSICIÓN, ORDEN Y DETALLE' : 'COMPOSITION, ORDER & DETAIL'}
           </span>
         </div>
 
         <p className="text-sm sm:text-base text-neutral-200/95 max-w-md font-sans leading-relaxed">
           {lang === 'es'
-            ? 'Creo piezas visuales desde un enfoque estético, claro y moderno. Exploro diseño, composición y movimiento para desarrollar contenido que mantenga coherencia, intención y una identidad visual limpia.'
-            : 'Creating visual pieces from a clear, modern aesthetic. Exploring design, composition, and motion to craft content with coherence, deliberate intent, and a clean visual identity.'}
+            ? 'Creo piezas visuales desde un enfoque estético, claro y moderno. Exploro diseño, composición y movimiento para desarrollar contenido que mantenga coherencia, intención y una identidad visual limpia'
+            : 'Creating visual pieces from a clear, modern aesthetic. Exploring design, composition, and motion to craft content with coherence, deliberate intent, and a clean visual identity'}
         </p>
 
         <div className="flex pointer-events-auto flex-col sm:flex-row items-stretch sm:items-center gap-2.5 sm:gap-3 w-full sm:w-auto">
@@ -445,14 +420,14 @@ const HeroSection: React.FC<HeroSectionProps> = ({ lang = 'es' }) => {
 
   return (
     <div className="relative bg-[#111111] overflow-hidden">
-      <div className="relative h-[100dvh] min-h-[100dvh] w-full">
+      <div className="relative min-h-[100dvh] w-full flex items-center">
         <div className="absolute inset-0 z-0 pointer-events-auto">
           <HeroAuthorSculptureCanvas />
         </div>
 
         <div
           ref={heroContentRef}
-          className="relative z-10 w-full h-full min-h-[100dvh] flex items-center justify-center pointer-events-none"
+          className="relative z-10 w-full min-h-[100dvh] flex items-center justify-center pointer-events-none"
         >
           <HeroContent lang={lang} />
         </div>
