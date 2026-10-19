@@ -31,7 +31,7 @@ const FORBIDDEN_CV_ENTITIES = [
   /alisson\s+g[oó]mez/i,
 ];
 
-describe('Portfolio Copy & Brand Compliance (S1 & S3)', () => {
+describe('Portfolio Copy, 3D Objects & Mobile/PC Optimization Compliance (S1, S2, S3)', () => {
   it('excludes all 3D / Spline / Cinema4D / zBrush mentions from portfolioData structures', () => {
     const serialized = JSON.stringify({
       PORTFOLIO_PROJECTS,
@@ -52,26 +52,25 @@ describe('Portfolio Copy & Brand Compliance (S1 & S3)', () => {
     }
   });
 
-  it('excludes visible 3D mentions from Hero, About, and Contact components', () => {
-    const heroFile = fs.readFileSync(
-      path.join(ROOT_DIR, 'src/components/ui/3d-hero-section-boxes.tsx'),
-      'utf-8'
-    );
-    const aboutFile = fs.readFileSync(
-      path.join(ROOT_DIR, 'src/components/AboutSection.tsx'),
-      'utf-8'
-    );
-    const contactFile = fs.readFileSync(
-      path.join(ROOT_DIR, 'src/components/ContactSection.tsx'),
-      'utf-8'
-    );
+  it('excludes visible 3D mentions from Hero, Showcase, About, Contact, and KineticMotion2D components', () => {
+    const filesToCheck = [
+      'src/components/ui/3d-hero-section-boxes.tsx',
+      'src/components/ProjectShowcase.tsx',
+      'src/components/AboutSection.tsx',
+      'src/components/ContactSection.tsx',
+      'src/components/ui/KineticMotion2D.tsx',
+    ];
 
-    expect(heroFile).not.toMatch(/Animación 2D & 3D/i);
-    expect(heroFile).not.toMatch(/2D & 3D Animation/i);
-    expect(heroFile).not.toMatch(/2D\/3D/i);
-    expect(heroFile).not.toMatch(/tridimensionales/i);
-    expect(contactFile).not.toMatch(/2D\/3D/i);
-    expect(aboutFile).not.toMatch(/2D\/3D/i);
+    for (const relPath of filesToCheck) {
+      const content = fs.readFileSync(path.join(ROOT_DIR, relPath), 'utf-8');
+      expect(content).not.toMatch(/Animación 2D & 3D/i);
+      expect(content).not.toMatch(/2D & 3D Animation/i);
+      expect(content).not.toMatch(/2D\/3D/i);
+      expect(content).not.toMatch(/tridimensionales/i);
+      expect(content).not.toMatch(/Cinema 4D/i);
+      expect(content).not.toMatch(/zBrush/i);
+      expect(content).not.toMatch(/Spline/i);
+    }
   });
 
   it('keeps authorized endorsers (Kriss Ecuador, Minerva, ISTER) and excludes discarded CV entities', () => {
@@ -83,7 +82,11 @@ describe('Portfolio Copy & Brand Compliance (S1 & S3)', () => {
       path.join(ROOT_DIR, 'src/components/ContactSection.tsx'),
       'utf-8'
     );
-    const combined = `${aboutFile}\n${contactFile}\n${JSON.stringify(PORTFOLIO_PROJECTS)}`;
+    const kineticFile = fs.readFileSync(
+      path.join(ROOT_DIR, 'src/components/ui/KineticMotion2D.tsx'),
+      'utf-8'
+    );
+    const combined = `${aboutFile}\n${contactFile}\n${kineticFile}\n${JSON.stringify(PORTFOLIO_PROJECTS)}`;
 
     expect(combined).toMatch(/Kriss Ecuador/);
     expect(combined).toMatch(/Minerva/);
@@ -99,6 +102,39 @@ describe('Portfolio Copy & Brand Compliance (S1 & S3)', () => {
       path.join(ROOT_DIR, 'src/components/ContactSection.tsx'),
       'utf-8'
     );
+    const kineticFile = fs.readFileSync(
+      path.join(ROOT_DIR, 'src/components/ui/KineticMotion2D.tsx'),
+      'utf-8'
+    );
     expect(contactFile).toContain('https://www.instagram.com/krisecuador/');
+    expect(kineticFile).toContain('https://www.instagram.com/krisecuador/');
+  });
+
+  it('enforces mobile/PC parity optimizations (DPR clamping, IntersectionObserver pause, prefers-reduced-motion, and dispose)', () => {
+    const heroFile = fs.readFileSync(
+      path.join(ROOT_DIR, 'src/components/ui/3d-hero-section-boxes.tsx'),
+      'utf-8'
+    );
+    const stageFile = fs.readFileSync(
+      path.join(ROOT_DIR, 'src/components/ui/ProjectAuthorObjectStage.tsx'),
+      'utf-8'
+    );
+    const kineticFile = fs.readFileSync(
+      path.join(ROOT_DIR, 'src/components/ui/KineticMotion2D.tsx'),
+      'utf-8'
+    );
+
+    expect(heroFile).toContain('IntersectionObserver');
+    expect(heroFile).toContain('prefers-reduced-motion');
+    expect(heroFile).toContain('setPixelRatio');
+    expect(heroFile).toContain('renderer.dispose()');
+
+    expect(stageFile).toContain('IntersectionObserver');
+    expect(stageFile).toContain('prefers-reduced-motion');
+    expect(stageFile).toContain('setPixelRatio');
+    expect(stageFile).toContain('renderer.dispose()');
+
+    expect(kineticFile).toContain('prefers-reduced-motion');
+    expect(kineticFile).toContain('useGSAP');
   });
 });
